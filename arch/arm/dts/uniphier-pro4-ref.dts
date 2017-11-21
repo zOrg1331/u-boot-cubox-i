@@ -4,22 +4,17 @@
  * Copyright (C) 2015-2016 Socionext Inc.
  *   Author: Masahiro Yamada <yamada.masahiro@socionext.com>
  *
- * SPDX-License-Identifier:	GPL-2.0+	X11
+ * SPDX-License-Identifier: (GPL-2.0+ OR MIT)
  */
 
 /dts-v1/;
-/include/ "uniphier-pro4.dtsi"
-/include/ "uniphier-ref-daughter.dtsi"
-/include/ "uniphier-support-card.dtsi"
+#include "uniphier-pro4.dtsi"
+#include "uniphier-ref-daughter.dtsi"
+#include "uniphier-support-card.dtsi"
 
 / {
 	model = "UniPhier Pro4 Reference Board";
 	compatible = "socionext,uniphier-pro4-ref", "socionext,uniphier-pro4";
-
-	memory {
-		device_type = "memory";
-		reg = <0x80000000 0x40000000>;
-	};
 
 	chosen {
 		stdout-path = "serial0:115200n8";
@@ -37,6 +32,11 @@
 		i2c5 = &i2c5;
 		i2c6 = &i2c6;
 		usb0 = &usb0;
+	};
+
+	memory@80000000 {
+		device_type = "memory";
+		reg = <0x80000000 0x40000000>;
 	};
 };
 
@@ -82,13 +82,4 @@
 
 &usb1 {
 	status = "okay";
-};
-
-/* for U-Boot only */
-&serial0 {
-	u-boot,dm-pre-reloc;
-};
-
-&pinctrl_uart0 {
-	u-boot,dm-pre-reloc;
 };

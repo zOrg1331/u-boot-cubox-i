@@ -5,8 +5,9 @@
  * SPDX-License-Identifier:	GPL-2.0+
  */
 
-#include <common.h>
 #include <linux/bitops.h>
+#include <linux/delay.h>
+#include <linux/errno.h>
 #include <linux/io.h>
 #include <linux/sizes.h>
 
@@ -17,6 +18,8 @@
 #define SC_PLLCTRL_SSC_EN		BIT(31)
 #define SC_PLLCTRL2_NRSTDS		BIT(28)
 #define SC_PLLCTRL2_SSC_JK_MASK		GENMASK(26, 0)
+#define SC_PLLCTRL3_REGI_SHIFT		16
+#define SC_PLLCTRL3_REGI_MASK		GENMASK(19, 16)
 
 /* PLL type: VPLL27 */
 #define SC_VPLL27CTRL_WP		BIT(0)
@@ -76,6 +79,25 @@ int uniphier_ld20_sscpll_ssc_en(unsigned long reg_base)
 	return 0;
 }
 
+int uniphier_ld20_sscpll_set_regi(unsigned long reg_base, unsigned regi)
+{
+	void __iomem *base;
+	u32 tmp;
+
+	base = ioremap(reg_base, SZ_16);
+	if (!base)
+		return -ENOMEM;
+
+	tmp = readl(base + 8);	/* SSCPLLCTRL3 */
+	tmp &= ~SC_PLLCTRL3_REGI_MASK;
+	tmp |= regi << SC_PLLCTRL3_REGI_SHIFT;
+	writel(tmp, base + 8);
+
+	iounmap(base);
+
+	return 0;
+}
+
 int uniphier_ld20_vpll27_init(unsigned long reg_base)
 {
 	void __iomem *base;
@@ -111,9 +133,9 @@ int uniphier_ld20_dspll_init(unsigned long reg_base)
 	if (!base)
 		return -ENOMEM;
 
-	tmp = readl(base + 8);		/* DSPLLCTRL2 */
+	tmp = readl(base + 4);		/* DSPLLCTRL2 */
 	tmp |= SC_DSPLLCTRL2_K_LD;
-	writel(tmp, base + 8);
+	writel(tmp, base + 4);
 
 	iounmap(base);
 

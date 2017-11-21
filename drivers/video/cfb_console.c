@@ -72,16 +72,6 @@
 #include <video.h>
 #include <linux/compiler.h>
 
-/*
- * Defines for the CT69000 driver
- */
-#ifdef	CONFIG_VIDEO_CT69000
-
-#define VIDEO_FB_LITTLE_ENDIAN
-#define VIDEO_HW_RECTFILL
-#define VIDEO_HW_BITBLT
-#endif
-
 #if defined(CONFIG_VIDEO_MXS)
 #define VIDEO_FB_16BPP_WORD_SWAP
 #endif
@@ -1079,8 +1069,8 @@ __weak void video_set_lut(unsigned int index, unsigned char r,
 }
 
 #define FILL_32BIT_X888RGB(r,g,b) {			\
-	*(unsigned long *)fb =				\
-		SWAP32((unsigned long)(((r<<16) |	\
+	*(u32 *)fb =				\
+		SWAP32((unsigned int)(((r<<16) |	\
 					(g<<8)  |	\
 					 b)));		\
 	fb += 4;					\
@@ -1161,7 +1151,7 @@ static void draw_bitmap(uchar **fb, uchar *bm, struct palette *p,
 		break;
 	case GDF_32BIT_X888RGB:
 		for (i = 0; i < cnt; i++) {
-			*(unsigned long *) addr = p[bm[*off]].ce.dw;
+			*(u32 *) addr = p[bm[*off]].ce.dw;
 			addr += 4;
 		}
 		break;
@@ -1825,8 +1815,8 @@ static void plot_logo_or_black(void *screen, int x, int y, int black)
 							 (b >> 3)));
 				break;
 			case GDF_32BIT_X888RGB:
-				*(unsigned long *) dest =
-					SWAP32((unsigned long) (
+				*(u32 *) dest =
+					SWAP32((u32) (
 							(r << 16) |
 							(g <<  8) |
 							 b));
@@ -1861,14 +1851,16 @@ static void *video_logo(void)
 	__maybe_unused int y_off = 0;
 	__maybe_unused ulong addr;
 	__maybe_unused char *s;
-	__maybe_unused int len, space;
+	__maybe_unused int len, ret, space;
 
 	splash_get_pos(&video_logo_xpos, &video_logo_ypos);
 
 #ifdef CONFIG_SPLASH_SCREEN
-	s = getenv("splashimage");
+	s = env_get("splashimage");
 	if (s != NULL) {
-		splash_screen_prepare();
+		ret = splash_screen_prepare();
+		if (ret < 0)
+			return video_fb_address;
 		addr = simple_strtoul(s, NULL, 16);
 
 		if (video_display_bitmap(addr,
@@ -1966,7 +1958,7 @@ static void *video_logo(void)
 static int cfb_fb_is_in_dram(void)
 {
 	bd_t *bd = gd->bd;
-#if defined(CONFIG_ARM) || defined(CONFIG_AVR32) || defined(COFNIG_NDS32) || \
+#if defined(CONFIG_ARM) || defined(CONFIG_NDS32) || \
 defined(CONFIG_SANDBOX) || defined(CONFIG_X86)
 	ulong start, end;
 	int i;
@@ -2089,7 +2081,8 @@ static int cfg_video_init(void)
 	}
 	eorx = fgx ^ bgx;
 
-	video_clear();
+	if (!CONFIG_IS_ENABLED(NO_FB_CLEAR))
+		video_clear();
 
 #ifdef CONFIG_VIDEO_LOGO
 	/* Plot the logo and get start point of console */

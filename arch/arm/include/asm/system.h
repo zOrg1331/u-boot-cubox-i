@@ -180,6 +180,21 @@ static inline unsigned long read_mpidr(void)
 void __asm_flush_dcache_all(void);
 void __asm_invalidate_dcache_all(void);
 void __asm_flush_dcache_range(u64 start, u64 end);
+
+/**
+ * __asm_invalidate_dcache_range() - Invalidate a range of virtual addresses
+ *
+ * This performance an invalidate from @start to @end - 1. Both addresses
+ * should be cache-aligned, otherwise this function will align the start
+ * address and may continue past the end address.
+ *
+ * Data in the address range is evicted from the cache and is not written back
+ * to memory.
+ *
+ * @start: Start address to invalidate
+ * @end: End address to invalidate up to (exclusive)
+ */
+void __asm_invalidate_dcache_range(u64 start, u64 end);
 void __asm_invalidate_tlb_all(void);
 void __asm_invalidate_icache_all(void);
 int __asm_invalidate_l3_dcache(void);
@@ -196,11 +211,12 @@ void __asm_switch_ttbr(u64 new_ttbr);
  *               For loading 32-bit OS, machine nr
  * @fdt_addr:    For loading 64-bit OS, zero.
  *               For loading 32-bit OS, fdt address.
+ * @arg4:	 Input argument.
  * @entry_point: kernel entry point
  * @es_flag:     execution state flag, ES_TO_AARCH64 or ES_TO_AARCH32
  */
-void armv8_switch_to_el2(u64 args, u64 mach_nr, u64 fdt_addr,
-			 u64 entry_point, u64 es_flag);
+void __noreturn armv8_switch_to_el2(u64 args, u64 mach_nr, u64 fdt_addr,
+				    u64 arg4, u64 entry_point, u64 es_flag);
 /*
  * Switch from EL2 to EL1 for ARMv8
  *
@@ -210,13 +226,14 @@ void armv8_switch_to_el2(u64 args, u64 mach_nr, u64 fdt_addr,
  *               For loading 32-bit OS, machine nr
  * @fdt_addr:    For loading 64-bit OS, zero.
  *               For loading 32-bit OS, fdt address.
+ * @arg4:	 Input argument.
  * @entry_point: kernel entry point
  * @es_flag:     execution state flag, ES_TO_AARCH64 or ES_TO_AARCH32
  */
 void armv8_switch_to_el1(u64 args, u64 mach_nr, u64 fdt_addr,
-			 u64 entry_point, u64 es_flag);
+			 u64 arg4, u64 entry_point, u64 es_flag);
 void armv8_el2_to_aarch32(u64 args, u64 mach_nr, u64 fdt_addr,
-			  u64 entry_point);
+			  u64 arg4, u64 entry_point);
 void gic_init(void);
 void gic_send_sgi(unsigned long sgino);
 void wait_for_wakeup(void);
@@ -224,6 +241,7 @@ void protect_secure_region(void);
 void smp_kick_all_cpus(void);
 
 void flush_l3_cache(void);
+void mmu_change_region_attr(phys_addr_t start, size_t size, u64 attrs);
 
 /*
  *Issue a secure monitor call in accordance with ARM "SMC Calling convention",

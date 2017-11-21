@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 # Copyright (c) 2016 Google, Inc
 # Written by Simon Glass <sjg@chromium.org>
@@ -17,11 +17,14 @@ import unittest
 
 # Bring in the patman and dtoc libraries
 our_path = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(our_path, '../patman'))
-sys.path.append(os.path.join(our_path, '../dtoc'))
+for dirname in ['../patman', '../dtoc', '..']:
+    sys.path.insert(0, os.path.join(our_path, dirname))
+
+# Bring in the libfdt module
+sys.path.insert(0, 'tools')
 
 # Also allow entry-type modules to be brought in from the etype directory.
-sys.path.append(os.path.join(our_path, 'etype'))
+sys.path.insert(0, os.path.join(our_path, 'etype'))
 
 import cmdline
 import command
