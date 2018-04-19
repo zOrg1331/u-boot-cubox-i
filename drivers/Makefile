@@ -35,7 +35,7 @@ obj-$(CONFIG_SPL_UBI) += mtd/ubispl/
 obj-$(CONFIG_SPL_DMA_SUPPORT) += dma/
 obj-$(CONFIG_SPL_ETH_SUPPORT) += net/
 obj-$(CONFIG_SPL_ETH_SUPPORT) += net/phy/
-obj-$(CONFIG_SPL_USBETH_SUPPORT) += net/phy/
+obj-$(CONFIG_SPL_USB_ETHER) += net/phy/
 obj-$(CONFIG_SPL_PCI_SUPPORT) += pci/
 obj-$(CONFIG_SPL_PCH_SUPPORT) += pch/
 obj-$(CONFIG_SPL_RTC_SUPPORT) += rtc/
@@ -50,6 +50,7 @@ obj-$(CONFIG_SPL_SATA_SUPPORT) += ata/ scsi/
 obj-$(CONFIG_SPL_USB_HOST_SUPPORT) += block/
 obj-$(CONFIG_SPL_MMC_SUPPORT) += block/
 obj-$(CONFIG_SPL_FPGA_SUPPORT) += fpga/
+obj-$(CONFIG_SPL_THERMAL) += thermal/
 
 endif
 endif

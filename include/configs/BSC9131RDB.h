@@ -17,7 +17,6 @@
 #define CONFIG_RAMBOOT_SPIFLASH
 #define CONFIG_SYS_RAMBOOT
 #define CONFIG_SYS_EXTRA_ENV_RELOC
-#define CONFIG_SYS_TEXT_BASE		0x11000000
 #define CONFIG_RESET_VECTOR_ADDRESS	0x110bfffc
 #endif
 
@@ -27,7 +26,6 @@
 #define CONFIG_SPL_FLUSH_IMAGE
 #define CONFIG_SPL_TARGET		"u-boot-with-spl.bin"
 
-#define CONFIG_SYS_TEXT_BASE		0x00201000
 #define CONFIG_SPL_TEXT_BASE		0xFFFFE000
 #define CONFIG_SPL_MAX_SIZE		8192
 #define CONFIG_SPL_RELOC_TEXT_BASE	0x00100000
@@ -287,9 +285,6 @@ extern unsigned long get_sdram_size(void);
 /*
  * Miscellaneous configurable options
  */
-#define CONFIG_SYS_LONGHELP			/* undef to save memory	*/
-#define CONFIG_CMDLINE_EDITING			/* Command-line editing */
-#define CONFIG_AUTO_COMPLETE			/* add autocompletion support */
 #define CONFIG_SYS_LOAD_ADDR	0x2000000	/* default load address */
 
 #if defined(CONFIG_CMD_KGDB)
@@ -322,9 +317,6 @@ extern unsigned long get_sdram_size(void);
  */
 #define CONFIG_MTD_DEVICE
 #define CONFIG_MTD_PARTITIONS
-#define MTDIDS_DEFAULT "nand0=ff800000.flash,"
-#define MTDPARTS_DEFAULT "mtdparts=ff800000.flash:1m(uboot)," \
-			"8m(kernel),512k(dtb),-(fs)"
 
 /*
  * Environment Configuration

@@ -39,6 +39,11 @@ static inline int rk_pll_id(enum rk_clk_id clk_id)
 	return clk_id - 1;
 }
 
+struct sysreset_reg {
+	unsigned int glb_srst_fst_value;
+	unsigned int glb_srst_snd_value;
+};
+
 /**
  * clk_get_divisor() - Calculate the required clock divisior
  *
@@ -79,5 +84,15 @@ struct rk3288_grf;
 void rk3288_clk_configure_cpu(struct rk3288_cru *cru, struct rk3288_grf *grf);
 
 int rockchip_get_clk(struct udevice **devp);
+
+/*
+ * rockchip_reset_bind() - Bind soft reset device as child of clock device
+ *
+ * @pdev: clock udevice
+ * @reg_offset: the first offset in cru for softreset registers
+ * @reg_number: the reg numbers of softreset registers
+ * @return 0 success, or error value
+ */
+int rockchip_reset_bind(struct udevice *pdev, u32 reg_offset, u32 reg_number);
 
 #endif

@@ -11,10 +11,6 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-#include <asm/hardware.h>
-
-#define CONFIG_SYS_TEXT_BASE		0x73f00000
-
 #define CONFIG_ATMEL_LEGACY		/* required until (g)pio is fixed */
 
 /* ARM asynchronous clock */
@@ -46,13 +42,10 @@
  * BOOTP options
  */
 #define CONFIG_BOOTP_BOOTFILESIZE
-#define CONFIG_BOOTP_BOOTPATH
-#define CONFIG_BOOTP_GATEWAY
-#define CONFIG_BOOTP_HOSTNAME
 
 /* SDRAM */
 #define CONFIG_NR_DRAM_BANKS		1
-#define CONFIG_SYS_SDRAM_BASE           ATMEL_BASE_CS6
+#define CONFIG_SYS_SDRAM_BASE           0x70000000
 #define CONFIG_SYS_SDRAM_SIZE		0x08000000
 
 #define CONFIG_SYS_INIT_SP_ADDR \
@@ -82,7 +75,7 @@
 #define CONFIG_SYS_MEMTEST_START	CONFIG_SYS_SDRAM_BASE
 #define CONFIG_SYS_MEMTEST_END		0x23e00000
 
-#ifdef CONFIG_SYS_USE_NANDFLASH
+#ifdef CONFIG_NAND_BOOT
 /* bootstrap + u-boot + env in nandflash */
 #define CONFIG_ENV_OFFSET		0x120000
 #define CONFIG_ENV_OFFSET_REDUND	0x100000
@@ -91,7 +84,7 @@
 #define CONFIG_BOOTCOMMAND						\
 	"nand read 0x70000000 0x200000 0x300000;"			\
 	"bootm 0x70000000"
-#elif CONFIG_SYS_USE_MMC
+#elif CONFIG_SD_BOOT
 /* bootstrap + u-boot + env + linux in mmc */
 #define CONFIG_ENV_SIZE		0x4000
 
@@ -100,24 +93,19 @@
 				"bootz 0x72000000 - 0x71000000"
 #endif
 
-#define CONFIG_SYS_LONGHELP
-#define CONFIG_CMDLINE_EDITING
-#define CONFIG_AUTO_COMPLETE
-
 /*
  * Size of malloc() pool
  */
 #define CONFIG_SYS_MALLOC_LEN		ROUND(3 * CONFIG_ENV_SIZE + 128*1024, 0x1000)
 
 /* Defines for SPL */
-#define CONFIG_SPL_FRAMEWORK
 #define CONFIG_SPL_TEXT_BASE		0x300000
 #define CONFIG_SPL_MAX_SIZE		0x010000
 #define CONFIG_SPL_STACK		0x310000
 
 #define CONFIG_SYS_MONITOR_LEN		0x80000
 
-#ifdef CONFIG_SYS_USE_MMC
+#ifdef CONFIG_SD_BOOT
 
 #define CONFIG_SPL_BSS_START_ADDR	0x70000000
 #define CONFIG_SPL_BSS_MAX_SIZE		0x00080000
@@ -127,7 +115,7 @@
 #define CONFIG_SYS_MMCSD_FS_BOOT_PARTITION	1
 #define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME		"u-boot.img"
 
-#elif CONFIG_SYS_USE_NANDFLASH
+#elif CONFIG_NAND_BOOT
 #define CONFIG_SPL_NAND_DRIVERS
 #define CONFIG_SPL_NAND_BASE
 #define CONFIG_SPL_NAND_ECC

@@ -21,7 +21,6 @@
 #define CONFIG_SYS_FSL_CLK
 
 /* Set TEXT at the beginning of the NOR flash */
-#define CONFIG_SYS_TEXT_BASE	0xA0000000
 
 #define CONFIG_CMDLINE_TAG		/* enable passing of ATAGs */
 #define CONFIG_REVISION_TAG
@@ -41,8 +40,6 @@
 #define CONFIG_SYS_I2C_MXC_I2C1		/* enable I2C bus 1 */
 #define CONFIG_SYS_I2C_MXC_I2C2		/* enable I2C bus 2 */
 #define CONFIG_SYS_I2C_MXC_I2C3		/* enable I2C bus 3 */
-#define CONFIG_MXC_SPI
-#define CONFIG_MXC_GPIO
 
 /*
  * PMIC Configs
@@ -73,9 +70,6 @@
 /*
  * Command definition
  */
-#define CONFIG_BOOTP_SUBNETMASK
-#define CONFIG_BOOTP_GATEWAY
-#define CONFIG_BOOTP_DNS
 
 #define CONFIG_NET_RETRY_COUNT	100
 
@@ -85,10 +79,6 @@
 /*
  * Ethernet on the debug board (SMC911)
  */
-#define CONFIG_SMC911X
-#define CONFIG_SMC911X_16_BIT 1
-#define CONFIG_SMC911X_BASE CS5_BASE_ADDR
-
 #define CONFIG_HAS_ETH1
 #define CONFIG_ETHPRIME
 
@@ -106,10 +96,6 @@
 /*
  * Miscellaneous configurable options
  */
-#define CONFIG_SYS_LONGHELP	/* undef to save memory */
-#define CONFIG_CMDLINE_EDITING
-
-#define CONFIG_AUTO_COMPLETE
 
 #define CONFIG_SYS_MEMTEST_START	0	/* memtest works on */
 #define CONFIG_SYS_MEMTEST_END		0x10000
@@ -139,10 +125,6 @@
 #define CONFIG_MTD_DEVICE
 #define CONFIG_FLASH_CFI_MTD
 #define CONFIG_MTD_PARTITIONS
-#define MTDIDS_DEFAULT		"nand0=mxc_nand,nor0=physmap-flash.0"
-#define MTDPARTS_DEFAULT	"mtdparts=mxc_nand:1m(boot),5m(linux),"	\
-				"96m(root),8m(cfg),1938m(user);"	\
-				"physmap-flash.0:512k(b),4m(k),30m(u),28m(r)"
 
 /*
  * FLASH and environment organization
@@ -182,7 +164,6 @@
 /*
  * NAND FLASH driver setup
  */
-#define CONFIG_NAND_MXC
 #define CONFIG_MXC_NAND_REGS_BASE	(NFC_BASE_ADDR)
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
 #define CONFIG_SYS_NAND_BASE		(NFC_BASE_ADDR)

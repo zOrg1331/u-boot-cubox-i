@@ -15,8 +15,12 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+const efi_guid_t efi_global_variable_guid = EFI_GLOBAL_VARIABLE_GUID;
 const efi_guid_t efi_guid_device_path = DEVICE_PATH_GUID;
 const efi_guid_t efi_guid_loaded_image = LOADED_IMAGE_GUID;
+const efi_guid_t efi_simple_file_system_protocol_guid =
+		EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_GUID;
+const efi_guid_t efi_file_info_guid = EFI_FILE_INFO_GUID;
 
 static efi_status_t efi_loader_relocate(const IMAGE_BASE_RELOCATION *rel,
 			unsigned long rel_size, void *efi_reloc)
@@ -67,6 +71,40 @@ static efi_status_t efi_loader_relocate(const IMAGE_BASE_RELOCATION *rel,
 void __weak invalidate_icache_all(void)
 {
 	/* If the system doesn't support icache_all flush, cross our fingers */
+}
+
+/*
+ * Determine the memory types to be used for code and data.
+ *
+ * @loaded_image_info	image descriptor
+ * @image_type		field Subsystem of the optional header for
+ *			Windows specific field
+ */
+static void efi_set_code_and_data_type(
+			struct efi_loaded_image *loaded_image_info,
+			uint16_t image_type)
+{
+	switch (image_type) {
+	case IMAGE_SUBSYSTEM_EFI_APPLICATION:
+		loaded_image_info->image_code_type = EFI_LOADER_CODE;
+		loaded_image_info->image_data_type = EFI_LOADER_DATA;
+		break;
+	case IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER:
+		loaded_image_info->image_code_type = EFI_BOOT_SERVICES_CODE;
+		loaded_image_info->image_data_type = EFI_BOOT_SERVICES_DATA;
+		break;
+	case IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER:
+	case IMAGE_SUBSYSTEM_EFI_ROM:
+		loaded_image_info->image_code_type = EFI_RUNTIME_SERVICES_CODE;
+		loaded_image_info->image_data_type = EFI_RUNTIME_SERVICES_DATA;
+		break;
+	default:
+		printf("%s: invalid image type: %u\n", __func__, image_type);
+		/* Let's assume it is an application */
+		loaded_image_info->image_code_type = EFI_LOADER_CODE;
+		loaded_image_info->image_data_type = EFI_LOADER_DATA;
+		break;
+	}
 }
 
 /*
@@ -126,10 +164,12 @@ void *efi_load_pe(void *efi, struct efi_loaded_image *loaded_image_info)
 		IMAGE_NT_HEADERS64 *nt64 = (void *)nt;
 		IMAGE_OPTIONAL_HEADER64 *opt = &nt64->OptionalHeader;
 		image_size = opt->SizeOfImage;
-		efi_reloc = efi_alloc(virt_size, EFI_LOADER_DATA);
+		efi_set_code_and_data_type(loaded_image_info, opt->Subsystem);
+		efi_reloc = efi_alloc(virt_size,
+				      loaded_image_info->image_code_type);
 		if (!efi_reloc) {
-			printf("%s: Could not allocate %ld bytes\n",
-				__func__, virt_size);
+			printf("%s: Could not allocate %lu bytes\n",
+			       __func__, virt_size);
 			return NULL;
 		}
 		entry = efi_reloc + opt->AddressOfEntryPoint;
@@ -139,10 +179,12 @@ void *efi_load_pe(void *efi, struct efi_loaded_image *loaded_image_info)
 		   (nt->OptionalHeader.Magic == IMAGE_NT_OPTIONAL_HDR32_MAGIC)) {
 		IMAGE_OPTIONAL_HEADER32 *opt = &nt->OptionalHeader;
 		image_size = opt->SizeOfImage;
-		efi_reloc = efi_alloc(virt_size, EFI_LOADER_DATA);
+		efi_set_code_and_data_type(loaded_image_info, opt->Subsystem);
+		efi_reloc = efi_alloc(virt_size,
+				      loaded_image_info->image_code_type);
 		if (!efi_reloc) {
-			printf("%s: Could not allocate %ld bytes\n",
-				__func__, virt_size);
+			printf("%s: Could not allocate %lu bytes\n",
+			       __func__, virt_size);
 			return NULL;
 		}
 		entry = efi_reloc + opt->AddressOfEntryPoint;

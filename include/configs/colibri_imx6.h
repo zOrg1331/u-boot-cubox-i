@@ -21,7 +21,6 @@
 
 #ifdef CONFIG_SPL
 #include "imx6_spl.h"
-#define CONFIG_SPL_PAD_TO		0x11000 /* 4k IVT/DCD, 64k SPL */
 #endif
 
 #define CONFIG_CMDLINE_TAG
@@ -40,7 +39,6 @@
 
 /* Make the HW version stuff available in U-Boot env */
 #define CONFIG_VERSION_VARIABLE		/* ver environment variable */
-#define CONFIG_ENV_VARS_UBOOT_CONFIG
 #define CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 
 /* I2C Configs */
@@ -86,12 +84,10 @@
 #define CONFIG_USBD_HS
 
 #define CONFIG_USB_GADGET_MASS_STORAGE
-#define CONFIG_USB_FUNCTION_MASS_STORAGE
 /* USB DFU */
 #define CONFIG_DFU_MMC
 
 /* Miscellaneous commands */
-#define CONFIG_MXC_GPIO
 
 /* Framebuffer and LCD */
 #define CONFIG_VIDEO_IPUV3
@@ -103,7 +99,6 @@
 #define CONFIG_BMP_16BPP
 #define CONFIG_VIDEO_LOGO
 #define CONFIG_VIDEO_BMP_LOGO
-#define CONFIG_IPUV3_CLK		260000000
 #define CONFIG_CONSOLE_MUX
 #define CONFIG_IMX_HDMI
 #define CONFIG_IMX_VIDEO_SKIP
@@ -125,7 +120,6 @@
 #define CONFIG_SERVERIP			192.168.10.1
 
 #define CONFIG_LOADADDR			0x12000000
-#define CONFIG_SYS_TEXT_BASE		0x17800000
 
 #ifdef CONFIG_CMD_MMC
 #define CONFIG_DRIVE_MMC "mmc "
@@ -230,8 +224,6 @@
 		"video=mxcfb1:off fbmem=8M\0 "
 
 /* Miscellaneous configurable options */
-#define CONFIG_SYS_LONGHELP
-#define CONFIG_AUTO_COMPLETE
 #undef CONFIG_SYS_CBSIZE
 #define CONFIG_SYS_CBSIZE		1024
 #undef CONFIG_SYS_MAXARGS
@@ -243,8 +235,6 @@
 #define CONFIG_SYS_MEMTEST_SCRATCH	0x10800000
 
 #define CONFIG_SYS_LOAD_ADDR		CONFIG_LOADADDR
-
-#define CONFIG_CMDLINE_EDITING
 
 /* Physical Memory Map */
 #define CONFIG_NR_DRAM_BANKS		1
@@ -273,7 +263,5 @@
 #define CONFIG_OF_SYSTEM_SETUP
 
 #define CONFIG_CMD_TIME
-
-#define CONFIG_SUPPORT_RAW_INITRD
 
 #endif	/* __CONFIG_H */

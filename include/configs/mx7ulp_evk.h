@@ -68,10 +68,6 @@
 #define CONFIG_CONS_INDEX		1
 #define CONFIG_BAUDRATE			115200
 
-#undef CONFIG_CMD_IMLS
-#define CONFIG_SYS_LONGHELP
-#define CONFIG_AUTO_COMPLETE
-
 #define CONFIG_SYS_CACHELINE_SIZE      64
 
 /* Miscellaneous configurable options */
@@ -80,17 +76,13 @@
 
 #define CONFIG_SYS_MAXARGS		256
 
-#define CONFIG_CMDLINE_EDITING
-
 /* Physical Memory Map */
 #define CONFIG_NR_DRAM_BANKS		1
 
-#define CONFIG_SYS_TEXT_BASE		0x67800000
 #define PHYS_SDRAM			0x60000000
 #define PHYS_SDRAM_SIZE			SZ_1G
 #define CONFIG_SYS_MEMTEST_START	PHYS_SDRAM
 #define CONFIG_SYS_SDRAM_BASE		PHYS_SDRAM
-#define CONFIG_CMD_BOOTZ
 
 #define CONFIG_LOADADDR             0x60800000
 

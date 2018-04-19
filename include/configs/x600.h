@@ -1,6 +1,6 @@
 /*
- * (C) Copyright 2009
- * Vipin Kumar, STMicroelectronics, <vipin.kumar@st.com>
+ * Copyright (C) 2009, STMicroelectronics - All Rights Reserved
+ * Author(s): Vipin Kumar, <vipin.kumar@st.com> for STMicroelectronics.
  *
  * Copyright (C) 2012, 2015 Stefan Roese <sr@denx.de>
  *
@@ -22,7 +22,6 @@
 /* Timer, HZ specific defines */
 #define CONFIG_SYS_HZ_CLOCK			8300000
 
-#define	CONFIG_SYS_TEXT_BASE			0x00800040
 #define CONFIG_SYS_FLASH_BASE			0xf8000000
 /* Reserve 8KiB for SPL */
 #define CONFIG_SPL_PAD_TO			8192	/* decimal for 'dd' */
@@ -38,7 +37,6 @@
 #define CONFIG_SYS_SERIAL1			0xD0080000
 #define CONFIG_PL01x_PORTS			{ (void *)CONFIG_SYS_SERIAL0, \
 						(void *)CONFIG_SYS_SERIAL1 }
-#define CONFIG_PL011_SERIAL
 #define CONFIG_PL011_CLOCK			(48 * 1000 * 1000)
 #define CONFIG_CONS_INDEX			0
 #define CONFIG_SYS_BAUDRATE_TABLE		{ 9600, 19200, 38400, \
@@ -87,18 +85,11 @@
 #define CONFIG_SYS_I2C_RTC_ADDR	0x68
 
 /* FPGA config options */
-#define CONFIG_FPGA
-#define CONFIG_FPGA_XILINX
-#define CONFIG_FPGA_SPARTAN3
 #define CONFIG_FPGA_COUNT	1
 
 /* USB EHCI options */
 #define CONFIG_USB_EHCI_SPEAR
 #define CONFIG_USB_MAX_CONTROLLER_COUNT	2
-
-/* Filesystem support (for USB key) */
-#define CONFIG_SUPPORT_VFAT
-
 
 /*
  * U-Boot Environment placing definitions.
@@ -122,22 +113,11 @@
 #define CONFIG_SYS_MEMTEST_START		0x00800000
 #define CONFIG_SYS_MEMTEST_END			0x04000000
 #define CONFIG_SYS_MALLOC_LEN			(8 << 20)
-#define CONFIG_SYS_LONGHELP
-#define CONFIG_CMDLINE_EDITING
-#define CONFIG_AUTO_COMPLETE
 #define CONFIG_SYS_LOAD_ADDR			0x00800000
-
-/* Use last 2 lwords in internal SRAM for bootcounter */
-#define CONFIG_BOOTCOUNT_LIMIT
-#define CONFIG_SYS_BOOTCOUNT_ADDR		(CONFIG_SRAM_BASE + \
-						 CONFIG_SRAM_SIZE)
 
 #define CONFIG_HOSTNAME				x600
 #define CONFIG_UBI_PART				ubi0
 #define CONFIG_UBIFS_VOLUME			rootfs
-
-#define MTDIDS_DEFAULT		"nand0=nand"
-#define MTDPARTS_DEFAULT	"mtdparts=nand:64M(ubi0),64M(ubi1)"
 
 #define	CONFIG_EXTRA_ENV_SETTINGS					\
 	"u-boot_addr=1000000\0"						\
@@ -194,8 +174,8 @@
 	"net_nfs=run load_dtb load_kernel; "				\
 		"run nfsargs addip addcon addmtd addmisc;"		\
 		"bootm ${kernel_addr} - ${dtb_addr}\0"			\
-	"mtdids=" MTDIDS_DEFAULT "\0"					\
-	"mtdparts=" MTDPARTS_DEFAULT "\0"				\
+	"mtdids=" CONFIG_MTDIDS_DEFAULT "\0"					\
+	"mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0"				\
 	"nand_ubifs=run ubifs_mount ubifs_load ubifsargs addip"		\
 		" addcon addmisc addmtd;"				\
 		"bootm ${kernel_addr} - ${dtb_addr}\0"			\
@@ -231,8 +211,6 @@
 #define CONFIG_SPL_TEXT_BASE		0xd2800b00
 #define CONFIG_SPL_MAX_SIZE		(CONFIG_SRAM_SIZE - 0xb00)
 #define	CONFIG_SPL_START_S_PATH	"arch/arm/cpu/arm926ejs/spear"
-
-#define CONFIG_SPL_FRAMEWORK
 
 /*
  * Please select/define only one of the following

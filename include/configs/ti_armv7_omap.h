@@ -12,16 +12,11 @@
 #ifndef __CONFIG_TI_ARMV7_OMAP_H__
 #define __CONFIG_TI_ARMV7_OMAP_H__
 
-/* I2C IP block */
-#define CONFIG_SYS_OMAP24_I2C_SPEED	100000
-#define CONFIG_SYS_OMAP24_I2C_SLAVE	1
-
 /*
  * GPMC NAND block.  We support 1 device and the physical address to
  * access CS0 at is 0x8000000.
  */
 #ifdef CONFIG_NAND
-#define CONFIG_NAND_OMAP_GPMC
 #ifndef CONFIG_SYS_NAND_BASE
 #define CONFIG_SYS_NAND_BASE		0x8000000
 #endif

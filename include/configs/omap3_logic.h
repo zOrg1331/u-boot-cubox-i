@@ -18,13 +18,6 @@
 #include <configs/ti_omap3_common.h>
 
 #ifdef CONFIG_SPL_BUILD
-/*
- * Disable MMC DM for SPL build and can be re-enabled after adding
- * DM support in SPL
- */
-#undef CONFIG_DM_MMC
-#undef OMAP_HSMMC_USE_GPIO
-
 /* select serial console configuration for SPL */
 #undef CONFIG_CONS_INDEX
 #define CONFIG_CONS_INDEX              1
@@ -38,7 +31,6 @@
  * order to allow for BCH8 to fit in.
  */
 #undef CONFIG_SPL_TEXT_BASE
-#define CONFIG_SPL_FRAMEWORK
 #define CONFIG_SPL_TEXT_BASE		0x40200000
 
 #define CONFIG_MISC_INIT_R		/* misc_init_r dumps the die id */
@@ -49,28 +41,15 @@
 
 /* Hardware drivers */
 
-#define CONFIG_USB_OMAP3
-
 /* I2C */
 #define CONFIG_SYS_I2C_EEPROM_ADDR	0x50	/* EEPROM AT24C64      */
 
-/* USB */
-#define CONFIG_USB_MUSB_OMAP2PLUS
-#define CONFIG_USB_MUSB_PIO_ONLY
-#define CONFIG_USB_ETHER
-
-/* TWL4030 */
-#define CONFIG_TWL4030_USB
-
 /* Board NAND Info. */
 #ifdef CONFIG_NAND
-#define CONFIG_NAND_OMAP_GPMC
-
 #define CONFIG_SYS_NAND_ADDR		NAND_BASE /* physical address */
 						  /* to access nand */
 #define CONFIG_SYS_MAX_NAND_DEVICE	1	  /* Max number of */
 						  /* NAND devices */
-#define CONFIG_SYS_NAND_BUSWIDTH_16BIT
 #define CONFIG_SYS_NAND_5_ADDR_CYCLE
 #define CONFIG_SYS_NAND_PAGE_COUNT	64
 #define CONFIG_SYS_NAND_PAGE_SIZE	2048
@@ -91,26 +70,18 @@
 #define CONFIG_SYS_NAND_MAX_ECCPOS	56
 #define CONFIG_MTD_DEVICE		/* needed for mtdparts commands */
 #define CONFIG_MTD_PARTITIONS		/* required for UBI partition support */
-#define MTDIDS_DEFAULT			"nand0=omap2-nand.0"
-#define MTDPARTS_DEFAULT	"mtdparts=omap2-nand.0:"\
-							"512k(MLO),"\
-							"1792k(u-boot),"\
-							"128k(spl-os)," \
-							"128k(u-boot-env),"\
-							"6m(kernel),-(fs)"
 #endif
 
 /* Environment information */
 
 #define CONFIG_PREBOOT \
 	"setenv preboot;"						\
-	"nand unlock;"							\
 	"saveenv;"
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	DEFAULT_LINUX_BOOT_ENV \
-	"mtdids=" MTDIDS_DEFAULT "\0"	\
-	"mtdparts=" MTDPARTS_DEFAULT "\0" \
+	"mtdids=" CONFIG_MTDIDS_DEFAULT "\0"	\
+	"mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0" \
 	"mmcdev=0\0" \
 	"mmcroot=/dev/mmcblk0p2 rw\0" \
 	"mmcrootfstype=ext4 rootwait\0" \
@@ -203,7 +174,6 @@
 		"tftpboot $loadaddr zImage;" \
 		"bootz $loadaddr\0" \
 	"nandbootcommon=echo 'Booting kernel from NAND...';" \
-		"nand unlock;" \
 		"run nandargs;" \
 		"run common_bootargs;" \
 		"run dump_bootargs;" \
@@ -235,18 +205,10 @@
 #define CONFIG_SYS_MONITOR_BASE		CONFIG_SYS_FLASH_BASE
 
 #define CONFIG_ENV_SIZE			(128 << 10)	/* 128 KiB */
-#define SMNAND_ENV_OFFSET		0x260000 /* environment starts here */
 
 #define CONFIG_SYS_ENV_SECT_SIZE	(128 << 10)	/* 128 KiB */
-#define CONFIG_ENV_OFFSET		SMNAND_ENV_OFFSET
-#define CONFIG_ENV_ADDR			SMNAND_ENV_OFFSET
-
-/* SMSC922x Ethernet */
-#if defined(CONFIG_CMD_NET)
-#define CONFIG_SMC911X
-#define CONFIG_SMC911X_32_BIT
-#define CONFIG_SMC911X_BASE	0x08000000
-#endif /* (CONFIG_CMD_NET) */
+#define CONFIG_ENV_OFFSET		0x260000
+#define CONFIG_ENV_ADDR			0x260000
 
 /* Defines for SPL */
 

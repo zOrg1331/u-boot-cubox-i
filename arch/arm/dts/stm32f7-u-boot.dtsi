@@ -22,3 +22,11 @@
 		 u-boot,dm-pre-reloc;
 	};
 };
+
+&pwrcfg {
+	u-boot,dm-pre-reloc;
+};
+
+&clk_hse {
+	u-boot,dm-pre-reloc;
+};

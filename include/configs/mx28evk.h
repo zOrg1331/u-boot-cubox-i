@@ -12,7 +12,6 @@
 #define __CONFIGS_MX28EVK_H__
 
 /* System configurations */
-#define CONFIG_MX28				/* i.MX28 SoC */
 #define CONFIG_MACH_TYPE	MACH_TYPE_MX28EVK
 
 /* Memory configuration */
@@ -61,16 +60,6 @@
 #ifdef CONFIG_CMD_NAND
 #define CONFIG_MTD_DEVICE
 #define CONFIG_MTD_PARTITIONS
-#define MTDIDS_DEFAULT			"nand0=gpmi-nand"
-#define MTDPARTS_DEFAULT			\
-	"mtdparts=gpmi-nand:"			\
-		"3m(bootloader)ro,"		\
-		"512k(environment),"		\
-		"512k(redundant-environment),"	\
-		"4m(kernel),"			\
-		"512k(fdt),"			\
-		"8m(ramdisk),"			\
-		"-(filesystem)"
 #endif
 
 /* FEC Ethernet on SoC */

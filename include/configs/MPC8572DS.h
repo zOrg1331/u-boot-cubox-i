@@ -13,10 +13,6 @@
 
 #include "../board/freescale/common/ics307_clk.h"
 
-#ifndef CONFIG_SYS_TEXT_BASE
-#define CONFIG_SYS_TEXT_BASE	0xeff40000
-#endif
-
 #ifndef CONFIG_RESET_VECTOR_ADDRESS
 #define CONFIG_RESET_VECTOR_ADDRESS	0xeffffffc
 #endif
@@ -58,7 +54,6 @@
 
 #define CONFIG_SYS_MEMTEST_START	0x00000000	/* memtest works on */
 #define CONFIG_SYS_MEMTEST_END		0x7fffffff
-#define CONFIG_PANIC_HANG	/* do not reset board on panic */
 
 /*
  * Config the L2 Cache as L2 SRAM
@@ -469,10 +464,8 @@
 #endif
 
 #define CONFIG_PCI_SCAN_SHOW		/* show pci devices on startup */
-#define CONFIG_SCSI_AHCI
 
 #ifdef CONFIG_SCSI_AHCI
-#define CONFIG_LIBATA
 #define CONFIG_SATA_ULI5288
 #define CONFIG_SYS_SCSI_MAX_SCSI_ID	4
 #define CONFIG_SYS_SCSI_MAX_LUN	1
@@ -554,9 +547,6 @@
 /*
  * Miscellaneous configurable options
  */
-#define CONFIG_SYS_LONGHELP			/* undef to save memory	*/
-#define CONFIG_CMDLINE_EDITING			/* Command-line editing */
-#define CONFIG_AUTO_COMPLETE			/* add autocompletion support */
 #define CONFIG_SYS_LOAD_ADDR	0x2000000	/* default load address */
 
 /*

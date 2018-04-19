@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2014 Xilinx, Inc. Michal Simek
+ * (C) Copyright 2014 - 2017 Xilinx, Inc. Michal Simek
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
@@ -11,6 +11,7 @@
 #include <asm/spl.h>
 #include <asm/arch/hardware.h>
 #include <asm/arch/sys_proto.h>
+#include <asm/arch/ps7_init_gpl.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -68,13 +69,6 @@ u32 spl_boot_device(void)
 	return mode;
 }
 
-#ifdef CONFIG_SPL_MMC_SUPPORT
-u32 spl_boot_mode(const u32 boot_device)
-{
-	return MMCSD_MODE_FS;
-}
-#endif
-
 #ifdef CONFIG_SPL_OS_BOOT
 int spl_start_uboot(void)
 {
@@ -82,23 +76,6 @@ int spl_start_uboot(void)
 	return 0;
 }
 #endif
-
-__weak void ps7_init(void)
-{
-	/*
-	 * This function is overridden by the one in
-	 * board/xilinx/zynq/(platform)/ps7_init_gpl.c, if it exists.
-	 */
-}
-
-__weak int ps7_post_config(void)
-{
-	/*
-	 * This function is overridden by the one in
-	 * board/xilinx/zynq/(platform)/ps7_init_gpl.c, if it exists.
-	 */
-	return 0;
-}
 
 void spl_board_prepare_for_boot(void)
 {

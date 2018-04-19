@@ -23,12 +23,15 @@ typedef volatile unsigned char	vu_char;
 #include <time.h>
 #include <asm-offsets.h>
 #include <linux/bitops.h>
+#include <linux/bug.h>
 #include <linux/delay.h>
 #include <linux/types.h>
+#include <linux/printk.h>
 #include <linux/string.h>
 #include <linux/stringify.h>
 #include <asm/ptrace.h>
 #include <stdarg.h>
+#include <stdio.h>
 #include <linux/kernel.h>
 
 #include <part.h>
@@ -42,69 +45,7 @@ typedef volatile unsigned char	vu_char;
 #define CONFIG_SYS_SUPPORT_64BIT_DATA
 #endif
 
-#ifdef DEBUG
-#define _DEBUG	1
-#else
-#define _DEBUG	0
-#endif
-
-#ifdef CONFIG_SPL_BUILD
-#define _SPL_BUILD	1
-#else
-#define _SPL_BUILD	0
-#endif
-
-/* Define this at the top of a file to add a prefix to debug messages */
-#ifndef pr_fmt
-#define pr_fmt(fmt) fmt
-#endif
-
-/*
- * Output a debug text when condition "cond" is met. The "cond" should be
- * computed by a preprocessor in the best case, allowing for the best
- * optimization.
- */
-#define debug_cond(cond, fmt, args...)			\
-	do {						\
-		if (cond)				\
-			printf(pr_fmt(fmt), ##args);	\
-	} while (0)
-
-/* Show a message if DEBUG is defined in a file */
-#define debug(fmt, args...)			\
-	debug_cond(_DEBUG, fmt, ##args)
-
-/* Show a message if not in SPL */
-#define warn_non_spl(fmt, args...)			\
-	debug_cond(!_SPL_BUILD, fmt, ##args)
-
-/*
- * An assertion is run-time check done in debug mode only. If DEBUG is not
- * defined then it is skipped. If DEBUG is defined and the assertion fails,
- * then it calls panic*( which may or may not reset/halt U-Boot (see
- * CONFIG_PANIC_HANG), It is hoped that all failing assertions are found
- * before release, and after release it is hoped that they don't matter. But
- * in any case these failing assertions cannot be fixed with a reset (which
- * may just do the same assertion again).
- */
-void __assert_fail(const char *assertion, const char *file, unsigned line,
-		   const char *function);
-#define assert(x) \
-	({ if (!(x) && _DEBUG) \
-		__assert_fail(#x, __FILE__, __LINE__, __func__); })
-
-#define error(fmt, args...) do {					\
-		printf("ERROR: " pr_fmt(fmt) "\nat %s:%d/%s()\n",	\
-			##args, __FILE__, __LINE__, __func__);		\
-} while (0)
-
-#ifndef BUG
-#define BUG() do { \
-	printf("BUG: failure at %s:%d/%s()!\n", __FILE__, __LINE__, __FUNCTION__); \
-	panic("BUG!"); \
-} while (0)
-#define BUG_ON(condition) do { if (unlikely((condition)!=0)) BUG(); } while(0)
-#endif /* BUG */
+#include <log.h>
 
 typedef void (interrupt_handler_t)(void *);
 
@@ -216,6 +157,7 @@ int last_stage_init(void);
 extern ulong monitor_flash_len;
 int mac_read_from_eeprom(void);
 extern u8 __dtb_dt_begin[];	/* embedded device tree blob */
+extern u8 __dtb_dt_spl_begin[];	/* embedded device tree blob for SPL/TPL */
 int set_cpu_clk_info(void);
 int mdm_init(void);
 int print_cpuinfo(void);
@@ -422,6 +364,9 @@ int	embedded_dtb_select(void);
 
 int	misc_init_f   (void);
 int	misc_init_r   (void);
+#if defined(CONFIG_VID)
+int	init_func_vid(void);
+#endif
 
 /* common/exports.c */
 void	jumptable_init(void);
@@ -529,6 +474,8 @@ int	is_core_valid (unsigned int);
  */
 int arch_cpu_init(void);
 
+void s_init(void);
+
 int	checkcpu      (void);
 int	checkicache   (void);
 int	checkdcache   (void);
@@ -624,6 +571,7 @@ ulong	usec2ticks    (unsigned long usec);
 ulong	ticks2usec    (unsigned long ticks);
 
 /* lib/gunzip.c */
+int gzip_parse_header(const unsigned char *src, unsigned long len);
 int gunzip(void *, int, unsigned char *, unsigned long *);
 int zunzip(void *dst, int dstlen, unsigned char *src, unsigned long *lenp,
 						int stoponerr, int offset);
@@ -699,46 +647,6 @@ unsigned int rand_r(unsigned int *seedp);
 /* serial stuff */
 int	serial_printf (const char *fmt, ...)
 		__attribute__ ((format (__printf__, 1, 2)));
-/* stdin */
-int	getc(void);
-int	tstc(void);
-
-/* stdout */
-#if !defined(CONFIG_SPL_BUILD) || \
-	(defined(CONFIG_TPL_BUILD) && defined(CONFIG_TPL_SERIAL_SUPPORT)) || \
-	(defined(CONFIG_SPL_BUILD) && !defined(CONFIG_TPL_BUILD) && \
-		defined(CONFIG_SPL_SERIAL_SUPPORT))
-void	putc(const char c);
-void	puts(const char *s);
-int	printf(const char *fmt, ...)
-		__attribute__ ((format (__printf__, 1, 2)));
-int	vprintf(const char *fmt, va_list args);
-#else
-#define	putc(...) do { } while (0)
-#define puts(...) do { } while (0)
-#define printf(...) do { } while (0)
-#define vprintf(...) do { } while (0)
-#endif
-
-/* stderr */
-#define eputc(c)		fputc(stderr, c)
-#define eputs(s)		fputs(stderr, s)
-#define eprintf(fmt,args...)	fprintf(stderr,fmt ,##args)
-
-/*
- * FILE based functions (can only be used AFTER relocation!)
- */
-#define stdin		0
-#define stdout		1
-#define stderr		2
-#define MAX_FILES	3
-
-int	fprintf(int file, const char *fmt, ...)
-		__attribute__ ((format (__printf__, 2, 3)));
-void	fputs(int file, const char *s);
-void	fputc(int file, const char c);
-int	ftstc(int file);
-int	fgetc(int file);
 
 /* lib/gzip.c */
 int gzip(void *dst, unsigned long *lenp,

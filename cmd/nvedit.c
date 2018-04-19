@@ -42,7 +42,6 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #if	!defined(CONFIG_ENV_IS_IN_EEPROM)	&& \
 	!defined(CONFIG_ENV_IS_IN_FLASH)	&& \
-	!defined(CONFIG_ENV_IS_IN_DATAFLASH)	&& \
 	!defined(CONFIG_ENV_IS_IN_MMC)		&& \
 	!defined(CONFIG_ENV_IS_IN_FAT)		&& \
 	!defined(CONFIG_ENV_IS_IN_EXT4)		&& \
@@ -54,7 +53,7 @@ DECLARE_GLOBAL_DATA_PTR;
 	!defined(CONFIG_ENV_IS_IN_REMOTE)	&& \
 	!defined(CONFIG_ENV_IS_IN_UBI)		&& \
 	!defined(CONFIG_ENV_IS_NOWHERE)
-# error Define one of CONFIG_ENV_IS_IN_{EEPROM|FLASH|DATAFLASH|MMC|FAT|EXT4|\
+# error Define one of CONFIG_ENV_IS_IN_{EEPROM|FLASH|MMC|FAT|EXT4|\
 NAND|NVRAM|ONENAND|SATA|SPI_FLASH|REMOTE|UBI} or CONFIG_ENV_IS_NOWHERE
 #endif
 
@@ -393,15 +392,18 @@ int do_env_ask(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
 		sprintf(message, "Please enter '%s': ", argv[1]);
 	} else {
 		/* env_ask envname message1 ... messagen [size] */
-		for (i = 2, pos = 0; i < argc; i++) {
+		for (i = 2, pos = 0; i < argc && pos+1 < sizeof(message); i++) {
 			if (pos)
 				message[pos++] = ' ';
 
-			strcpy(message + pos, argv[i]);
+			strncpy(message + pos, argv[i], sizeof(message) - pos);
 			pos += strlen(argv[i]);
 		}
-		message[pos++] = ' ';
-		message[pos] = '\0';
+		if (pos < sizeof(message) - 1) {
+			message[pos++] = ' ';
+			message[pos] = '\0';
+		} else
+			message[CONFIG_SYS_CBSIZE - 1] = '\0';
 	}
 
 	if (size >= CONFIG_SYS_CBSIZE)
@@ -648,12 +650,14 @@ char *env_get(const char *name)
  */
 int env_get_f(const char *name, char *buf, unsigned len)
 {
-	int i, nxt;
+	int i, nxt, c;
 
 	for (i = 0; env_get_char(i) != '\0'; i = nxt + 1) {
 		int val, n;
 
-		for (nxt = i; env_get_char(nxt) != '\0'; ++nxt) {
+		for (nxt = i; (c = env_get_char(nxt)) != '\0'; ++nxt) {
+			if (c < 0)
+				return c;
 			if (nxt >= CONFIG_ENV_SIZE)
 				return -1;
 		}
@@ -664,7 +668,10 @@ int env_get_f(const char *name, char *buf, unsigned len)
 
 		/* found; copy out */
 		for (n = 0; n < len; ++n, ++buf) {
-			*buf = env_get_char(val++);
+			c = env_get_char(val++);
+			if (c < 0)
+				return c;
+			*buf = c;
 			if (*buf == '\0')
 				return n;
 		}
@@ -706,10 +713,6 @@ ulong env_get_ulong(const char *name, int base, ulong default_val)
 static int do_env_save(cmd_tbl_t *cmdtp, int flag, int argc,
 		       char * const argv[])
 {
-	struct env_driver *env = env_driver_lookup_default();
-
-	printf("Saving Environment to %s...\n", env->name);
-
 	return env_save() ? 1 : 0;
 }
 
@@ -927,7 +930,7 @@ NXTARG:		;
 				H_MATCH_KEY | H_MATCH_IDENT,
 				&ptr, size, argc, argv);
 		if (len < 0) {
-			error("Cannot export environment: errno = %d\n", errno);
+			pr_err("Cannot export environment: errno = %d\n", errno);
 			return 1;
 		}
 		sprintf(buf, "%zX", (size_t)len);
@@ -947,7 +950,7 @@ NXTARG:		;
 			H_MATCH_KEY | H_MATCH_IDENT,
 			&res, ENV_SIZE, argc, argv);
 	if (len < 0) {
-		error("Cannot export environment: errno = %d\n", errno);
+		pr_err("Cannot export environment: errno = %d\n", errno);
 		return 1;
 	}
 
@@ -1082,7 +1085,7 @@ static int do_env_import(cmd_tbl_t *cmdtp, int flag,
 
 	if (himport_r(&env_htab, ptr, size, sep, del ? 0 : H_NOCLEAR,
 			crlf_is_lf, 0, NULL) == 0) {
-		error("Environment import failed: errno = %d\n", errno);
+		pr_err("Environment import failed: errno = %d\n", errno);
 		return 1;
 	}
 	gd->flags |= GD_FLG_ENV_READY;

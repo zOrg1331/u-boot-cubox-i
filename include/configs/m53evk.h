@@ -8,8 +8,6 @@
 #ifndef __M53EVK_CONFIG_H__
 #define __M53EVK_CONFIG_H__
 
-#define CONFIG_MXC_GPIO
-
 #include <asm/arch/imx-regs.h>
 
 #define CONFIG_REVISION_TAG
@@ -39,18 +37,13 @@
 #define CONFIG_SYS_INIT_SP_ADDR \
 	(CONFIG_SYS_INIT_RAM_ADDR + CONFIG_SYS_INIT_SP_OFFSET)
 
-#define CONFIG_SYS_TEXT_BASE		0x71000000
-
 /*
  * U-Boot general configurations
  */
-#define CONFIG_SYS_LONGHELP
 #define CONFIG_SYS_CBSIZE	1024		/* Console I/O buffer size */
 #define CONFIG_SYS_MAXARGS	32		/* Max number of command args */
 #define CONFIG_SYS_BARGSIZE	CONFIG_SYS_CBSIZE
 						/* Boot argument buffer size */
-#define CONFIG_AUTO_COMPLETE			/* Command auto complete */
-#define CONFIG_CMDLINE_EDITING			/* Command history etc */
 
 /*
  * Serial Driver
@@ -75,7 +68,6 @@
 #ifdef CONFIG_CMD_NAND
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
 #define CONFIG_SYS_NAND_BASE		NFC_BASE_ADDR_AXI
-#define CONFIG_NAND_MXC
 #define CONFIG_MXC_NAND_REGS_BASE	NFC_BASE_ADDR_AXI
 #define CONFIG_MXC_NAND_IP_REGS_BASE	NFC_BASE_ADDR
 #define CONFIG_SYS_NAND_LARGEPAGE
@@ -92,15 +84,6 @@
 
 #define CONFIG_MTD_DEVICE
 #define CONFIG_MTD_PARTITIONS
-#define MTDIDS_DEFAULT			"nand0=mxc_nand"
-#define MTDPARTS_DEFAULT			\
-	"mtdparts=mxc_nand:"			\
-		"1024k(u-boot),"		\
-		"512k(env1),"			\
-		"512k(env2),"			\
-		"14m(boot),"			\
-		"240m(data),"			\
-		"-@2048k(UBI)"
 #endif
 
 /*
@@ -151,12 +134,10 @@
  * SATA
  */
 #ifdef CONFIG_CMD_SATA
-#define CONFIG_DWC_AHSATA
 #define CONFIG_SYS_SATA_MAX_DEVICE	1
 #define CONFIG_DWC_AHSATA_PORT_ID	0
 #define CONFIG_DWC_AHSATA_BASE_ADDR	SATA_BASE_ADDR
 #define CONFIG_LBA48
-#define CONFIG_LIBATA
 #endif
 
 /*
@@ -172,7 +153,6 @@
 #define CONFIG_BMP_16BPP
 #define CONFIG_VIDEO_LOGO
 #define CONFIG_SYS_VIDEO_LOGO_MAX_SIZE	(2 << 20)
-#define CONFIG_IPUV3_CLK		200000000
 #endif
 
 /*
@@ -190,7 +170,6 @@
 /*
  * NAND SPL
  */
-#define CONFIG_SPL_FRAMEWORK
 #define CONFIG_SPL_TARGET		"u-boot-with-nand-spl.imx"
 #define CONFIG_SPL_TEXT_BASE		0x70008000
 #define CONFIG_SPL_PAD_TO		0x8000

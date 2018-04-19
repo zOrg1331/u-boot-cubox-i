@@ -15,8 +15,6 @@
 
 #define CONFIG_MACH_TYPE	MACH_TYPE_MCX
 
-#define CONFIG_EMIF4	/* The chip has EMIF4 controller */
-
 #include <asm/arch/cpu.h>		/* get chip and board defs */
 #include <asm/arch/omap.h>
 
@@ -24,7 +22,6 @@
  * Leave it at 0x80008000 to allow booting new u-boot.bin with X-loader
  * and older u-boot.bin with the new U-Boot SPL.
  */
-#define CONFIG_SYS_TEXT_BASE		0x80008000
 
 /* Clock Defines */
 #define V_OSCK			26000000	/* Clock output from T2 */
@@ -81,8 +78,6 @@
 #define CONFIG_MTD_DEVICE
 
 #define CONFIG_SYS_I2C
-#define CONFIG_SYS_OMAP24_I2C_SPEED	100000
-#define CONFIG_SYS_OMAP24_I2C_SLAVE	1
 
 /* RTC */
 #define CONFIG_RTC_DS1337
@@ -111,11 +106,6 @@
 #define CONFIG_BOOTFILE		"uImage"
 
 /* Setup MTD for NAND on the SOM */
-#define MTDIDS_DEFAULT		"nand0=omap2-nand.0"
-#define MTDPARTS_DEFAULT	"mtdparts=omap2-nand.0:512k(MLO),"	\
-				"1m(u-boot),256k(env1),"		\
-				"256k(env2),6m(kernel),6m(k_recovery),"	\
-				"8m(fs_recovery),-(common_data)"
 
 #define CONFIG_HOSTNAME mcx
 #define CONFIG_EXTRA_ENV_SETTINGS \
@@ -202,13 +192,9 @@
 	"bootcmd=mmc rescan;if fatload mmc 0 82000000 loadbootscr.scr;"	\
 		"then source 82000000;else run nandboot;fi\0"
 
-#define CONFIG_AUTO_COMPLETE
-#define CONFIG_CMDLINE_EDITING
-
 /*
  * Miscellaneous configurable options
  */
-#define CONFIG_SYS_LONGHELP		/* undef to save memory */
 #define CONFIG_SYS_CBSIZE		1024/* Console I/O Buffer Size */
 /* Boot Argument Buffer Size */
 #define CONFIG_SYS_BARGSIZE		(CONFIG_SYS_CBSIZE)
@@ -241,15 +227,11 @@
  */
 
 /* **** PISMO SUPPORT *** */
-#define CONFIG_SYS_NAND_BUSWIDTH_16BIT
-#define CONFIG_NAND_OMAP_GPMC
-#define CONFIG_NAND_OMAP_GPMC_PREFETCH
-#define SMNAND_ENV_OFFSET		0x180000 /* environment starts here */
 
 /* Redundant Environment */
 #define CONFIG_SYS_ENV_SECT_SIZE	(128 << 10)	/* 128 KiB */
-#define CONFIG_ENV_OFFSET		SMNAND_ENV_OFFSET
-#define CONFIG_ENV_ADDR			SMNAND_ENV_OFFSET
+#define CONFIG_ENV_OFFSET		0x180000
+#define CONFIG_ENV_ADDR			0x180000
 #define CONFIG_ENV_OFFSET_REDUND	(CONFIG_ENV_OFFSET + \
 						2 * CONFIG_SYS_ENV_SECT_SIZE)
 #define CONFIG_ENV_SIZE_REDUND		CONFIG_ENV_SIZE
@@ -270,8 +252,6 @@
 					 GENERATED_GBL_DATA_SIZE)
 
 /* Defines for SPL */
-#define CONFIG_SPL_FRAMEWORK
-#define CONFIG_SPL_NAND_SIMPLE
 
 #define CONFIG_SPL_NAND_BASE
 #define CONFIG_SPL_NAND_DRIVERS
@@ -317,7 +297,6 @@
 #define CONFIG_DRIVER_TI_EMAC
 #define CONFIG_DRIVER_TI_EMAC_USE_RMII
 #define CONFIG_MII
-#define CONFIG_BOOTP_DNS
 #define CONFIG_BOOTP_DNS2
 #define CONFIG_BOOTP_SEND_HOSTNAME
 #define CONFIG_NET_RETRY_COUNT 10

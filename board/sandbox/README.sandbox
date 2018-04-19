@@ -24,6 +24,12 @@ single board in board/sandbox.
 CONFIG_SANDBOX_BIG_ENDIAN should be defined when running on big-endian
 machines.
 
+There are two versions of the sandbox: One using 32-bit-wide integers, and one
+using 64-bit-wide integers. The 32-bit version can be build and run on either
+32 or 64-bit hosts by either selecting or deselecting CONFIG_SANDBOX_32BIT; by
+default, the sandbox it built for a 32-bit host. The sandbox using 64-bit-wide
+integers can only be built on 64-bit hosts.
+
 Note that standalone/API support is not available at present.
 
 
@@ -43,10 +49,6 @@ Note:
 
       make sandbox_defconfig all NO_SDL=1
       ./u-boot
-
-   If you are building on a 32-bit machine you may get errors from __ffs.h
-   about shifting more than the machine word size. Edit the config file
-   include/configs/sandbox.h and change CONFIG_SANDBOX_BITS_PER_LONG to 32.
 
 U-Boot will start on your computer, showing a sandbox emulation of the serial
 console:
@@ -338,6 +340,11 @@ $> lodev=`sudo losetup -P -f --show ./disk.raw`
 $> sudo mkfs.vfat -n EFI -v ${lodev}p1
 $> sudo mkfs.ext4 -L ROOT -v ${lodev}p2
 
+or utilize the device described in test/py/make_test_disk.py:
+
+   #!/usr/bin/python
+   import make_test_disk
+   make_test_disk.makeDisk()
 
 Writing Sandbox Drivers
 -----------------------

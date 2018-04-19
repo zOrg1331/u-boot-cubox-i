@@ -17,13 +17,11 @@
 
 /* High Level Configuration Options */
 #define CONFIG_EXYNOS4210		1	/* which is a EXYNOS4210 SoC */
-#define CONFIG_SMDKV310			1	/* working with SMDKV310*/
 
 /* Mach Type */
 #define CONFIG_MACH_TYPE		MACH_TYPE_SMDKV310
 
 #define CONFIG_SYS_SDRAM_BASE		0x40000000
-#define CONFIG_SYS_TEXT_BASE		0x43E00000
 
 /* Handling Sleep Mode*/
 #define S5P_CHECK_SLEEP			0x00000BAD
@@ -88,9 +86,6 @@
 
 /* Ethernet Controllor Driver */
 #ifdef CONFIG_CMD_NET
-#define CONFIG_SMC911X
-#define CONFIG_SMC911X_BASE		0x5000000
-#define CONFIG_SMC911X_16_BIT
 #define CONFIG_ENV_SROM_BANK		1
 #endif /*CONFIG_CMD_NET*/
 

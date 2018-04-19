@@ -107,46 +107,14 @@
 #define CONFIG_SF_DEFAULT_BUS        1
 #define CONFIG_SF_DEFAULT_CS         0
 
-/*
-* USB
-*/
-/* EHCI Support - disbaled by default */
-/*#define CONFIG_HAS_FSL_DR_USB*/
-
-#ifdef CONFIG_HAS_FSL_DR_USB
-#define CONFIG_USB_EHCI_FSL
-#define CONFIG_EHCI_HCD_INIT_AFTER_RESET
-#endif
-
-/*XHCI Support - enabled by default*/
-#define CONFIG_HAS_FSL_XHCI_USB
-
-#ifdef CONFIG_HAS_FSL_XHCI_USB
-#define CONFIG_USB_XHCI_FSL
-#define CONFIG_USB_MAX_CONTROLLER_COUNT         1
-#endif
-
 /*  MMC  */
 #ifdef CONFIG_MMC
 #define CONFIG_FSL_ESDHC
 #define CONFIG_SYS_FSL_MMC_HAS_CAPBLT_VS33
 #endif
 
-/* SATA */
-#define CONFIG_LIBATA
-#define CONFIG_SCSI_AHCI
-#define CONFIG_SCSI_AHCI_PLAT
-
-#define CONFIG_SYS_SATA				AHCI_BASE_ADDR
-
-#define CONFIG_SYS_SCSI_MAX_SCSI_ID		1
-#define CONFIG_SYS_SCSI_MAX_LUN			1
-#define CONFIG_SYS_SCSI_MAX_DEVICE		(CONFIG_SYS_SCSI_MAX_SCSI_ID * \
-						CONFIG_SYS_SCSI_MAX_LUN)
-
 #define CONFIG_PCIE1		/* PCIE controller 1 */
 
-#define CONFIG_NET_MULTI
 #define CONFIG_PCI_SCAN_SHOW
 
 #define CONFIG_CMD_MEMINFO

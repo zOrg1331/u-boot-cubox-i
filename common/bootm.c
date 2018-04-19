@@ -248,7 +248,7 @@ int bootm_find_images(int flag, int argc, char * const argv[])
 #endif
 
 #if IMAGE_ENABLE_FIT
-#if defined(CONFIG_FPGA) && defined(CONFIG_FPGA_XILINX)
+#if defined(CONFIG_FPGA)
 	/* find bitstreams */
 	ret = boot_get_fpga(argc, argv, &images, IH_ARCH_DEFAULT,
 			    NULL, NULL);
@@ -809,9 +809,6 @@ static const void *boot_get_kernel(cmd_tbl_t *cmdtp, int flag, int argc,
 					      &fit_uname_kernel);
 
 	bootstage_mark(BOOTSTAGE_ID_CHECK_MAGIC);
-
-	/* copy from dataflash if needed */
-	img_addr = genimg_get_image(img_addr);
 
 	/* check image type, for FIT images get FIT kernel node */
 	*os_data = *os_len = 0;

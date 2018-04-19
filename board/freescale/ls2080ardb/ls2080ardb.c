@@ -13,7 +13,7 @@
 #include <asm/io.h>
 #include <hwconfig.h>
 #include <fdt_support.h>
-#include <libfdt.h>
+#include <linux/libfdt.h>
 #include <fsl-mc/fsl_mc.h>
 #include <environment.h>
 #include <efi_loader.h>
@@ -71,11 +71,10 @@ int checkboard(void)
 #ifdef CONFIG_TARGET_LS2081ARDB
 #ifdef CONFIG_FSL_QIXIS
 	sw = QIXIS_READ(arch);
-	printf("Board Arch: V%d, ", sw >> 4);
 	printf("Board version: %c, ", (sw & 0xf) + 'A');
 
 	sw = QIXIS_READ(brdcfg[0]);
-	sw = (sw & QIXIS_QMAP_MASK) >> QIXIS_QMAP_SHIFT;
+	sw = (sw >> QIXIS_QMAP_SHIFT) & QIXIS_QMAP_MASK;
 	switch (sw) {
 	case 0:
 		puts("boot from QSPI DEV#0\n");
@@ -101,6 +100,7 @@ int checkboard(void)
 		printf("invalid setting of SW%u\n", sw);
 		break;
 	}
+	printf("FPGA: v%d.%d\n", QIXIS_READ(scver), QIXIS_READ(tagdata));
 #endif
 	puts("SERDES1 Reference : ");
 	printf("Clock1 = 100MHz ");
@@ -218,6 +218,10 @@ int board_init(void)
 #ifdef CONFIG_FSL_QIXIS
 	QIXIS_WRITE(rst_ctl, QIXIS_RST_CTL_RESET_EN);
 #endif
+
+#ifdef CONFIG_FSL_CAAM
+	sec_init();
+#endif
 #ifdef CONFIG_FSL_LS_PPA
 	ppa_init();
 #endif
@@ -247,6 +251,8 @@ int misc_init_r(void)
 	char *env_hwconfig;
 	u32 __iomem *dcfg_ccsr = (u32 __iomem *)DCFG_BASE;
 	u32 val;
+	struct ccsr_gur __iomem *gur = (void *)(CONFIG_SYS_FSL_GUTS_ADDR);
+	u32 svr = gur_in32(&gur->svr);
 
 	val = in_le32(dcfg_ccsr + DCFG_RCWSR13 / 4);
 
@@ -274,6 +280,16 @@ int misc_init_r(void)
 
 	if (adjust_vdd(0))
 		printf("Warning: Adjusting core voltage failed.\n");
+	/*
+	 * Default value of board env is based on filename which is
+	 * ls2080ardb. Modify board env for other supported SoCs
+	 */
+	if ((SVR_SOC_VER(svr) == SVR_LS2088A) ||
+	    (SVR_SOC_VER(svr) == SVR_LS2048A))
+		env_set("board", "ls2088ardb");
+	else if ((SVR_SOC_VER(svr) == SVR_LS2081A) ||
+	    (SVR_SOC_VER(svr) == SVR_LS2041A))
+		env_set("board", "ls2081ardb");
 
 	return 0;
 }
@@ -315,7 +331,7 @@ void fdt_fixup_board_enet(void *fdt)
 		return;
 	}
 
-	if (get_mc_boot_status() == 0)
+	if ((get_mc_boot_status() == 0) && (get_dpl_apply_status() == 0))
 		fdt_status_okay(fdt, offset);
 	else
 		fdt_status_fail(fdt, offset);

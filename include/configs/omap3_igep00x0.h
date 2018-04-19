@@ -41,11 +41,6 @@
 #define GPIO_IGEP00X0_BOARD_DETECTION		28
 #define GPIO_IGEP00X0_REVISION_DETECTION	129
 
-/* USB */
-#define CONFIG_USB_MUSB_UDC		1
-#define CONFIG_USB_OMAP3		1
-#define CONFIG_TWL4030_USB		1
-
 /* USB device configuration */
 #define CONFIG_USB_DEVICE		1
 #define CONFIG_USB_TTY			1
@@ -72,10 +67,6 @@
 #define BOOT_TARGET_DEVICES(func) \
 	func(MMC, mmc, 0)
 
-#define CONFIG_BOOTCOMMAND \
-	"run findfdt; " \
-	"run distro_bootcmd"
-
 #include <config_distro_bootcmd.h>
 
 #define ENV_FINDFDT \
@@ -101,15 +92,6 @@
 
 #endif
 
-/*
- * SMSC911x Ethernet
- */
-#if defined(CONFIG_CMD_NET)
-#define CONFIG_SMC911X
-#define CONFIG_SMC911X_32_BIT
-#define CONFIG_SMC911X_BASE		0x2C000000
-#endif /* (CONFIG_CMD_NET) */
-
 #define CONFIG_MTD_PARTITIONS
 #define CONFIG_SYS_MTDPARTS_RUNTIME
 
@@ -119,7 +101,6 @@
 #define CONFIG_SYS_ONENAND_BLOCK_SIZE	(128*1024)
 
 /* NAND config */
-#define CONFIG_SYS_NAND_BUSWIDTH_16BIT
 #define CONFIG_SYS_NAND_5_ADDR_CYCLE
 #define CONFIG_SYS_NAND_PAGE_COUNT	64
 #define CONFIG_SYS_NAND_PAGE_SIZE	2048
@@ -136,7 +117,6 @@
 #define CONFIG_SYS_NAND_ECCSIZE		512
 #define CONFIG_SYS_NAND_ECCBYTES	14
 #define CONFIG_NAND_OMAP_ECCSCHEME	OMAP_ECC_BCH8_CODE_HW_DETECTION_SW
-#define CONFIG_NAND_OMAP_GPMC
 
 /* UBI configuration */
 #define CONFIG_SPL_UBI			1

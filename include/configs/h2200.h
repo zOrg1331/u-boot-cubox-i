@@ -12,7 +12,6 @@
 #define CONFIG_MACH_TYPE		MACH_TYPE_H2200
 
 #define CONFIG_CPU_PXA25X		1
-#define CONFIG_BOARD_H2200
 
 #define CONFIG_NR_DRAM_BANKS		1
 #define PHYS_SDRAM_1			0xa0000000 /* SDRAM Bank #1 */
@@ -42,8 +41,6 @@
  *	.org 0x1000
  * --- Header end ---
  */
-
-#define CONFIG_SYS_TEXT_BASE		0xa0041000
 
 /*
  * Static chips
@@ -123,11 +120,9 @@
 	"bootm ; "
 
 #define CONFIG_USB_GADGET_PXA2XX
-#define CONFIG_USB_ETHER
 #define CONFIG_USB_ETH_SUBSET
 
 #define CONFIG_USBNET_DEV_ADDR		"de:ad:be:ef:00:01"
-#define CONFIG_USBNET_HOST_ADDR	"de:ad:be:ef:00:02"
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"stdin=serial\0" \
 	"stdout=serial\0" \

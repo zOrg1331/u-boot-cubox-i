@@ -17,16 +17,12 @@
 
 #define CONFIG_REMAKE_ELF
 
-#define CONFIG_SUPPORT_RAW_INITRD
-
 /* Link Definitions */
 #if defined(CONFIG_TARGET_VEXPRESS64_BASE_FVP) || \
 	defined(CONFIG_TARGET_VEXPRESS64_BASE_FVP_DRAM)
 /* ATF loads u-boot here for BASE_FVP model */
-#define CONFIG_SYS_TEXT_BASE		0x88000000
 #define CONFIG_SYS_INIT_SP_ADDR         (CONFIG_SYS_SDRAM_BASE + 0x03f00000)
 #elif CONFIG_TARGET_VEXPRESS64_JUNO
-#define CONFIG_SYS_TEXT_BASE		0xe0000000
 #define CONFIG_SYS_INIT_SP_ADDR         (CONFIG_SYS_SDRAM_BASE + 0x7fff0)
 #endif
 
@@ -102,13 +98,7 @@
 /* Size of malloc() pool */
 #define CONFIG_SYS_MALLOC_LEN		(CONFIG_ENV_SIZE + (8 << 20))
 
-/* Ethernet Configuration */
-#ifdef CONFIG_TARGET_VEXPRESS64_JUNO
-/* The real hardware Versatile express uses SMSC9118 */
-#define CONFIG_SMC911X			1
-#define CONFIG_SMC911X_32_BIT		1
-#define CONFIG_SMC911X_BASE		(0x018000000)
-#else
+#ifndef CONFIG_TARGET_VEXPRESS64_JUNO
 /* The Vexpress64 simulators use SMSC91C111 */
 #define CONFIG_SMC91111			1
 #define CONFIG_SMC91111_BASE		(0x01A000000)
@@ -116,8 +106,6 @@
 
 /* PL011 Serial Configuration */
 #define CONFIG_CONS_INDEX		0
-#define CONFIG_PL01X_SERIAL
-#define CONFIG_PL011_SERIAL
 #ifdef CONFIG_TARGET_VEXPRESS64_JUNO
 #define CONFIG_PL011_CLOCK		7273800
 #else
@@ -128,10 +116,6 @@
 
 /* BOOTP options */
 #define CONFIG_BOOTP_BOOTFILESIZE
-#define CONFIG_BOOTP_BOOTPATH
-#define CONFIG_BOOTP_GATEWAY
-#define CONFIG_BOOTP_HOSTNAME
-#define CONFIG_BOOTP_PXE
 
 /* Miscellaneous configurable options */
 #define CONFIG_SYS_LOAD_ADDR		(V2M_BASE + 0x10000000)
@@ -230,8 +214,6 @@
 
 /* Monitor Command Prompt */
 #define CONFIG_SYS_CBSIZE		512	/* Console I/O Buffer Size */
-#define CONFIG_SYS_LONGHELP
-#define CONFIG_CMDLINE_EDITING
 #define CONFIG_SYS_MAXARGS		64	/* max command args */
 
 #ifdef CONFIG_TARGET_VEXPRESS64_JUNO

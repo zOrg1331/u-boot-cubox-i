@@ -257,6 +257,7 @@ int gen10g_startup(struct phy_device *phydev);
 int gen10g_shutdown(struct phy_device *phydev);
 int gen10g_discover_mmds(struct phy_device *phydev);
 
+int phy_b53_init(void);
 int phy_mv88e61xx_init(void);
 int phy_aquantia_init(void);
 int phy_atheros_init(void);
@@ -268,6 +269,7 @@ int phy_lxt_init(void);
 int phy_marvell_init(void);
 int phy_micrel_ksz8xxx_init(void);
 int phy_micrel_ksz90x1_init(void);
+int phy_meson_gxl_init(void);
 int phy_natsemi_init(void);
 int phy_realtek_init(void);
 int phy_smsc_init(void);

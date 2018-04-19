@@ -11,7 +11,6 @@
 #define __BLANCHE_H
 
 #undef DEBUG
-#define CONFIG_R8A7792
 #define CONFIG_RMOBILE_BOARD_STRING "Blanche"
 
 #include "rcar-gen2-common.h"
@@ -39,12 +38,9 @@
 
 /* FLASH */
 #if !defined(CONFIG_MTD_NOR_FLASH)
-#define CONFIG_SYS_TEXT_BASE	0x40000000
 #define CONFIG_SPI
-#define CONFIG_SH_QSPI
 #define CONFIG_SH_QSPI_BASE	0xE6B10000
 #else
-#define CONFIG_SYS_TEXT_BASE		0x00000000
 #define CONFIG_SYS_FLASH_CFI
 #define CONFIG_SYS_FLASH_CFI_WIDTH	FLASH_CFI_16BIT
 #define CONFIG_FLASH_CFI_DRIVER
@@ -65,11 +61,6 @@
 #undef  CONFIG_CMD_SPI
 #endif
 
-/* BLANCHE on board LANC: SMC89218 (ExCS0) */
-#define CONFIG_NET_MULTI
-#define CONFIG_SMC911X                  1
-#define CONFIG_SMC911X_16_BIT           1
-#define CONFIG_SMC911X_BASE             0x18000000
 
 /* Board Clock */
 #define RMOBILE_XTAL_CLK	20000000u
@@ -104,6 +95,5 @@
 
 /* SDHI */
 #define CONFIG_SH_SDHI_FREQ	97500000
-#define HAVE_BLOCK_DEVICE
 
 #endif	/* __BLANCHE_H */

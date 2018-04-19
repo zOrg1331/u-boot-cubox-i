@@ -9,14 +9,12 @@
 
 #include "rockchip-common.h"
 
-#define CONFIG_ENV_SIZE			0x2000
 #define CONFIG_SYS_MALLOC_LEN		(32 << 20)
 #define CONFIG_SYS_CBSIZE		1024
 #define CONFIG_SKIP_LOWLEVEL_INIT
 
 #define CONFIG_SYS_NS16550_MEM32
 
-#define CONFIG_SYS_TEXT_BASE		0x00200000
 #define CONFIG_SYS_INIT_SP_ADDR		0x00300000
 #define CONFIG_SYS_LOAD_ADDR		0x00800800
 
@@ -24,9 +22,6 @@
 
 /* MMC/SD IP block */
 #define CONFIG_BOUNCE_BUFFER
-
-#define CONFIG_SUPPORT_VFAT
-#define CONFIG_FS_EXT4
 
 /* RAW SD card / eMMC locations. */
 #define CONFIG_SYS_SPI_U_BOOT_OFFS	(128 << 10)

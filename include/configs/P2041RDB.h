@@ -30,10 +30,6 @@
 #define CONFIG_SYS_BOOK3E_HV		/* Category E.HV supported */
 #define CONFIG_MP			/* support multiple processors */
 
-#ifndef CONFIG_SYS_TEXT_BASE
-#define CONFIG_SYS_TEXT_BASE	0xeff40000
-#endif
-
 #ifndef CONFIG_RESET_VECTOR_ADDRESS
 #define CONFIG_RESET_VECTOR_ADDRESS	0xeffffffc
 #endif
@@ -116,7 +112,6 @@ unsigned long get_board_sys_clk(unsigned long dummy);
 #define CONFIG_SYS_MEMTEST_START	0x00200000	/* memtest works on */
 #define CONFIG_SYS_MEMTEST_END		0x00400000
 #define CONFIG_SYS_ALT_MEMTEST
-#define CONFIG_PANIC_HANG	/* do not reset board on panic */
 
 /*
  *  Config the L3 Cache as L3 SRAM
@@ -438,7 +433,6 @@ unsigned long get_board_sys_clk(unsigned long dummy);
 #define CONFIG_SYS_PCIE3_IO_SIZE	0x00010000	/* 64k */
 
 /* Qman/Bman */
-#define CONFIG_SYS_DPAA_QBMAN		/* Support Q/Bman */
 #define CONFIG_SYS_BMAN_NUM_PORTALS	10
 #define CONFIG_SYS_BMAN_MEM_BASE	0xf4000000
 #ifdef CONFIG_PHYS_64BIT
@@ -527,9 +521,6 @@ unsigned long get_board_sys_clk(unsigned long dummy);
 #define CONFIG_FSL_SATA_V2
 
 #ifdef CONFIG_FSL_SATA_V2
-#define CONFIG_FSL_SATA
-#define CONFIG_LIBATA
-
 #define CONFIG_SYS_SATA_MAX_DEVICE	2
 #define CONFIG_SATA1
 #define CONFIG_SYS_SATA1		CONFIG_SYS_MPC85xx_SATA1_ADDR
@@ -590,9 +581,6 @@ unsigned long get_board_sys_clk(unsigned long dummy);
 /*
  * Miscellaneous configurable options
  */
-#define CONFIG_SYS_LONGHELP			/* undef to save memory	*/
-#define CONFIG_CMDLINE_EDITING			/* Command-line editing */
-#define CONFIG_AUTO_COMPLETE			/* add autocompletion support */
 #define CONFIG_SYS_LOAD_ADDR	0x2000000	/* default load address */
 
 /*

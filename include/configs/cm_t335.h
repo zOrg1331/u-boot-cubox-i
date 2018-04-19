@@ -16,7 +16,6 @@
 #include <configs/ti_am335x_common.h>
 
 #undef CONFIG_SPI
-#undef CONFIG_BOOTCOUNT_LIMIT
 #undef CONFIG_SPL_AM33XX_ENABLE_RTC32K_OSC
 
 #undef CONFIG_MAX_RAM_BANK_SIZE
@@ -43,8 +42,8 @@
 		"bootm ${loadaddr}\0"
 
 #define NANDARGS \
-	"mtdids=" MTDIDS_DEFAULT "\0" \
-	"mtdparts=" MTDPARTS_DEFAULT "\0" \
+	"mtdids=" CONFIG_MTDIDS_DEFAULT "\0" \
+	"mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0" \
 	"nandroot=ubi0:rootfs rw\0" \
 	"nandrootfstype=ubifs\0" \
 	"nandargs=setenv bootargs console=${console} " \
@@ -125,11 +124,6 @@
 #undef CONFIG_SYS_NAND_U_BOOT_OFFS
 #define CONFIG_SYS_NAND_U_BOOT_OFFS	0x200000
 
-#define MTDIDS_DEFAULT			"nand0=nand"
-#define MTDPARTS_DEFAULT		"mtdparts=nand:2m(spl)," \
-					"1m(u-boot),1m(u-boot-env)," \
-					"1m(dtb),4m(splash)," \
-					"6m(kernel),-(rootfs)"
 #define CONFIG_ENV_OFFSET		0x300000 /* environment starts here */
 #define CONFIG_SYS_ENV_SECT_SIZE	(128 << 10)	/* 128 KiB */
 #define CONFIG_SYS_NAND_ONFI_DETECTION

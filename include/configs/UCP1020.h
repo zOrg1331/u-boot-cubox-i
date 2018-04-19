@@ -89,7 +89,6 @@
 #define CONFIG_RAMBOOT_SDCARD
 #define CONFIG_SYS_RAMBOOT
 #define CONFIG_SYS_EXTRA_ENV_RELOC
-#define CONFIG_SYS_TEXT_BASE		0x11000000
 #define CONFIG_RESET_VECTOR_ADDRESS	0x1107fffc
 #endif
 
@@ -97,13 +96,9 @@
 #define CONFIG_RAMBOOT_SPIFLASH
 #define CONFIG_SYS_RAMBOOT
 #define CONFIG_SYS_EXTRA_ENV_RELOC
-#define CONFIG_SYS_TEXT_BASE		0x11000000
 #define CONFIG_RESET_VECTOR_ADDRESS	0x1107fffc
 #endif
 
-#ifndef CONFIG_SYS_TEXT_BASE
-#define CONFIG_SYS_TEXT_BASE		0xeff80000
-#endif
 #define CONFIG_SYS_TEXT_BASE_NOR	0xeff80000
 
 #ifndef CONFIG_RESET_VECTOR_ADDRESS
@@ -118,9 +113,7 @@
 
 #define CONFIG_ENV_OVERWRITE
 
-#define CONFIG_SATA_SIL
 #define CONFIG_SYS_SATA_MAX_DEVICE	2
-#define CONFIG_LIBATA
 #define CONFIG_LBA48
 
 #define CONFIG_SYS_CLK_FREQ	66666666
@@ -138,7 +131,6 @@
 
 #define CONFIG_SYS_MEMTEST_START	0x00200000	/* memtest works on */
 #define CONFIG_SYS_MEMTEST_END		0x1fffffff
-#define CONFIG_PANIC_HANG	/* do not reset board on panic */
 
 #define CONFIG_SYS_CCSRBAR		0xffe00000
 #define CONFIG_SYS_CCSRBAR_PHYS_LOW	CONFIG_SYS_CCSRBAR
@@ -438,8 +430,6 @@
 /*
  * Miscellaneous configurable options
  */
-#define CONFIG_SYS_LONGHELP			/* undef to save memory */
-#define CONFIG_CMDLINE_EDITING			/* Command-line editing */
 #define CONFIG_SYS_LOAD_ADDR	0x2000000	/* default load address */
 #define CONFIG_SYS_HZ		1000	/* decrementer freq: 1ms tick */
 

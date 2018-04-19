@@ -14,7 +14,6 @@
 #define CONFIG_BOARD_COMMON
 
 #define CONFIG_SYS_SDRAM_BASE		0x40000000
-#define CONFIG_SYS_TEXT_BASE		0x43E00000
 
 /* select serial console configuration */
 #define CONFIG_SERIAL2			/* use SERIAL 2 */
@@ -34,7 +33,7 @@
 
 #define CONFIG_SYS_INIT_SP_ADDR        (CONFIG_SYS_LOAD_ADDR - 0x1000000)
 
-#define CONFIG_DEFAULT_CONSOLE		"console=ttySAC2,115200n8\0"
+#define CONFIG_DEFAULT_CONSOLE		"ttySAC2,115200n8"
 
 /* USB */
 #define CONFIG_USB_EHCI_EXYNOS
@@ -45,14 +44,12 @@
 #define DFU_MANIFEST_POLL_TIMEOUT       25000
 
 /* THOR */
-#define CONFIG_G_DNL_THOR_VENDOR_NUM	CONFIG_G_DNL_VENDOR_NUM
+#define CONFIG_G_DNL_THOR_VENDOR_NUM	CONFIG_USB_GADGET_VENDOR_NUM
 #define CONFIG_G_DNL_THOR_PRODUCT_NUM	0x685D
-#define CONFIG_USB_FUNCTION_THOR
 
 /* UMS */
 #define CONFIG_G_DNL_UMS_VENDOR_NUM	0x0525
 #define CONFIG_G_DNL_UMS_PRODUCT_NUM	0xA4A5
-#define CONFIG_USB_FUNCTION_MASS_STORAGE
 
 /* FIXME: MUST BE REMOVED AFTER TMU IS TURNED ON */
 #undef CONFIG_EXYNOS_TMU
@@ -108,7 +105,7 @@
 	BOOTENV \
 	"bootdelay=0\0" \
 	"rootfstype=ext4\0" \
-	"console=" CONFIG_DEFAULT_CONSOLE \
+	"console=" CONFIG_DEFAULT_CONSOLE "\0"\
 	"fdtfile=exynos5422-odroidxu3.dtb\0" \
 	"boardname=odroidxu3\0" \
 	"mmcbootdev=0\0" \

@@ -31,15 +31,13 @@
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_SDRAM_BASE + 0x5E00000)
 #define CONFIG_SYS_LOAD_ADDR		(CONFIG_SYS_SDRAM_BASE + 0x3E00000)
 
-#define CONFIG_SYS_TEXT_BASE		0x43e00000
-
 /* select serial console configuration */
 #define CONFIG_SERIAL2
 
 /* Console configuration */
 
 #define CONFIG_BOOTCOMMAND		"run autoboot"
-#define CONFIG_DEFAULT_CONSOLE		"console=ttySAC2,115200n8\0"
+#define CONFIG_DEFAULT_CONSOLE		"ttySAC2,115200n8"
 
 #define CONFIG_SYS_INIT_SP_ADDR	(CONFIG_SYS_LOAD_ADDR \
 					- GENERATED_GBL_DATA_SIZE)
@@ -54,7 +52,6 @@
 
 #define CONFIG_ENV_OVERWRITE
 
-#define CONFIG_ENV_VARS_UBOOT_CONFIG
 #define CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 
 /* Tizen - partitions definitions */
@@ -111,7 +108,7 @@
 	"boottrace=setenv opts initcall_debug; run bootcmd\0" \
 	"verify=n\0" \
 	"rootfstype=ext4\0" \
-	"console=" CONFIG_DEFAULT_CONSOLE \
+	"console=" CONFIG_DEFAULT_CONSOLE "\0" \
 	"kernelname=uImage\0" \
 	"loaduimage=ext4load mmc ${mmcdev}:${mmcbootpart} 0x40007FC0 " \
 		"${kernelname}\0" \
@@ -150,11 +147,9 @@
 	"fdtaddr=40800000\0" \
 
 /* GPT */
-#define CONFIG_RANDOM_UUID
 
 /* Security subsystem - enable hw_rand() */
 #define CONFIG_EXYNOS_ACE_SHA
-#define CONFIG_LIB_HW_RAND
 
 /* Common misc for Samsung */
 #define CONFIG_MISC_COMMON
@@ -163,7 +158,6 @@
 
 /* Download menu - Samsung common */
 #define CONFIG_LCD_MENU
-#define CONFIG_LCD_MENU_BOARD
 
 /* Download menu - definitions for check keys */
 #ifndef __ASSEMBLY__

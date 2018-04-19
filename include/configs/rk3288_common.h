@@ -12,7 +12,6 @@
 
 #define CONFIG_SKIP_LOWLEVEL_INIT_ONLY
 #define CONFIG_NR_DRAM_BANKS		1
-#define CONFIG_ENV_SIZE			0x2000
 #define CONFIG_SYS_MALLOC_LEN		(32 << 20)
 #define CONFIG_SYS_CBSIZE		1024
 
@@ -20,19 +19,19 @@
 #define	CONFIG_SYS_TIMER_BASE		0xff810020 /* TIMER7 */
 #define CONFIG_SYS_TIMER_COUNTER	(CONFIG_SYS_TIMER_BASE + 8)
 
-#define CONFIG_SPL_FRAMEWORK
 #define CONFIG_SYS_NS16550_MEM32
 
 #ifdef CONFIG_SPL_ROCKCHIP_BACK_TO_BROM
 /* Bootrom will load u-boot binary to 0x0 once return from SPL */
-#define CONFIG_SYS_TEXT_BASE		0x00000000
-#else
-#define CONFIG_SYS_TEXT_BASE		0x00100000
 #endif
 #define CONFIG_SYS_INIT_SP_ADDR		0x00100000
 #define CONFIG_SYS_LOAD_ADDR		0x00800800
 #define CONFIG_SPL_STACK		0xff718000
-#define CONFIG_SPL_TEXT_BASE		0xff704004
+#if defined(CONFIG_SPL_BUILD) && defined(CONFIG_TPL_BOOTROM_SUPPORT)
+# define CONFIG_SPL_TEXT_BASE		0x0
+#else
+# define CONFIG_SPL_TEXT_BASE		0xff704000
+#endif
 
 /* MMC/SD IP block */
 #define CONFIG_BOUNCE_BUFFER
@@ -55,10 +54,8 @@
 
 #ifndef CONFIG_SPL_BUILD
 /* usb otg */
-#define CONFIG_ROCKCHIP_USB2_PHY
 
 /* usb mass storage */
-#define CONFIG_USB_FUNCTION_MASS_STORAGE
 #define CONFIG_CMD_USB_MASS_STORAGE
 
 /* usb host support */

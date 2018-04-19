@@ -34,7 +34,6 @@
 #define CONFIG_SYS_MEMTEST_START	CONFIG_SYS_SDRAM_BASE
 #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_SDRAM_BASE + 0x5E00000)
 #define CONFIG_SYS_LOAD_ADDR		(CONFIG_SYS_SDRAM_BASE + 0x3E00000)
-#define CONFIG_SYS_TEXT_BASE		0x43e00000
 
 #include <linux/sizes.h>
 
@@ -44,7 +43,7 @@
 /* Console configuration */
 
 #define CONFIG_BOOTCOMMAND		"run autoboot"
-#define CONFIG_DEFAULT_CONSOLE		"console=ttySAC1,115200n8\0"
+#define CONFIG_DEFAULT_CONSOLE		"ttySAC1,115200n8"
 
 #define CONFIG_SYS_INIT_SP_ADDR	(CONFIG_SYS_LOAD_ADDR \
 					- GENERATED_GBL_DATA_SIZE)
@@ -158,7 +157,7 @@
 		"elif test -e mmc 0 uImage; then; " \
 			"run boot_uimg;" \
 		"fi;\0" \
-	"console=" CONFIG_DEFAULT_CONSOLE \
+	"console=" CONFIG_DEFAULT_CONSOLE "\0" \
 	"mmcbootdev=0\0" \
 	"mmcbootpart=1\0" \
 	"mmcrootdev=0\0" \
@@ -174,11 +173,9 @@
 	"fdtaddr=40800000\0"
 
 /* GPT */
-#define CONFIG_RANDOM_UUID
 
 /* Security subsystem - enable hw_rand() */
 #define CONFIG_EXYNOS_ACE_SHA
-#define CONFIG_LIB_HW_RAND
 
 /* USB */
 #define CONFIG_USB_EHCI_EXYNOS

@@ -14,6 +14,12 @@ source "arch/Kconfig"
 
 menu "General setup"
 
+config BROKEN
+	bool
+	help
+	  This option cannot be enabled. It is used as dependency
+	  for broken and incomplete features.
+
 config LOCALVERSION
 	string "Local version - append to U-Boot release"
 	help
@@ -60,21 +66,58 @@ config DISTRO_DEFAULTS
 	default y if ARCH_MESON
 	default y if ARCH_ROCKCHIP
 	default n
+	imply USE_BOOTCOMMAND
 	select CMD_BOOTZ if ARM && !ARM64
 	select CMD_BOOTI if ARM64
-	select CMD_DHCP
-	select CMD_PXE
+	select CMD_DHCP if NET && CMD_NET
+	select CMD_PXE if NET && CMD_NET
 	select CMD_EXT2
 	select CMD_EXT4
 	select CMD_FAT
 	select CMD_FS_GENERIC
-	select CMD_MII
-	select CMD_PING
-	select CMD_PART
+	imply CMD_MII if NET
+	select CMD_PING if NET
+	select CMD_PART if PARTITIONS
 	select HUSH_PARSER
+	select BOOTP_BOOTPATH if NET && CMD_NET
+	select BOOTP_DNS if NET && CMD_NET
+	select BOOTP_GATEWAY if NET && CMD_NET
+	select BOOTP_HOSTNAME if NET && CMD_NET
+	select BOOTP_PXE if NET && CMD_NET
+	select BOOTP_SUBNETMASK if NET && CMD_NET
+	select CMDLINE_EDITING
+	select AUTO_COMPLETE
+	select SYS_LONGHELP
+	select SUPPORT_RAW_INITRD
+	select ENV_VARS_UBOOT_CONFIG
 	help
 	  Select this to enable various options and commands which are suitable
 	  for building u-boot for booting general purpose Linux distributions.
+
+config ENV_VARS_UBOOT_CONFIG
+	bool "Add arch, board, vendor and soc variables to default environment"
+	help
+	  Define this in order to add variables describing the
+	  U-Boot build configuration to the default environment.
+	  These will be named arch, cpu, board, vendor, and soc.
+	  Enabling this option will cause the following to be defined:
+	  - CONFIG_SYS_ARCH
+	  - CONFIG_SYS_CPU
+	  - CONFIG_SYS_BOARD
+	  - CONFIG_SYS_VENDOR
+	  - CONFIG_SYS_SOC
+
+config SYS_BOOT_GET_CMDLINE
+	bool "Enable kernel command line setup"
+	help
+	  Enables allocating and saving kernel cmdline in space between
+	  "bootm_low" and "bootm_low" + BOOTMAPSZ.
+
+config SYS_BOOT_GET_KBD
+	bool "Enable kernel board information setup"
+	help
+	  Enables allocating and saving a kernel copy of the bd_info in
+	  space between "bootm_low" and "bootm_low" + BOOTMAPSZ.
 
 config SYS_MALLOC_F
 	bool "Enable malloc() pool before relocation"
@@ -157,6 +200,15 @@ config PHYS_64BIT
 	  Say Y here to support 64bit physical memory address.
 	  This can be used not only for 64bit SoCs, but also for
 	  large physical address extention on 32bit SoCs.
+
+config BUILD_ROM
+	bool "Build U-Boot as BIOS replacement"
+	depends on X86
+	help
+	  This option allows to build a ROM version of U-Boot.
+	  The build process generally requires several binary blobs
+	  which are not shipped in the U-Boot source tree.
+	  Please, see doc/README.x86 for details.
 
 endmenu		# General setup
 
@@ -273,7 +325,7 @@ config SPL_LOAD_FIT
 
 config SPL_FIT_IMAGE_POST_PROCESS
 	bool "Enable post-processing of FIT artifacts after loading by the SPL"
-	depends on SPL_LOAD_FIT && TI_SECURE_DEVICE
+	depends on SPL_LOAD_FIT
 	help
 	  Allows doing any sort of manipulation to blobs after they got extracted
 	  from the U-Boot FIT image like stripping off headers or modifying the
@@ -350,15 +402,13 @@ config SYS_EXTRA_OPTIONS
 	  new boards should not use this option.
 
 config SYS_TEXT_BASE
-	depends on ARC || X86 || ARCH_UNIPHIER || ARCH_ZYNQMP || \
-		(M68K && !TARGET_ASTRO_MCF5373L) || MICROBLAZE || MIPS || \
-		ARCH_ZYNQ || ARCH_KEYSTONE || ARCH_OMAP2PLUS
+	depends on !NIOS2 && !XTENSA
 	depends on !EFI_APP
+	default 0x80800000 if ARCH_OMAP2PLUS
 	hex "Text Base"
 	help
-	  TODO: Move CONFIG_SYS_TEXT_BASE for all the architecture
+	  The address in memory that U-Boot will be running from, initially.
 
-	default 0x80800000 if ARCH_OMAP2PLUS
 
 
 config SYS_CLK_FREQ
@@ -398,5 +448,3 @@ source "fs/Kconfig"
 source "lib/Kconfig"
 
 source "test/Kconfig"
-
-source "scripts/Kconfig"

@@ -13,7 +13,6 @@
 #include <asm/hardware.h>
 
 /* The first stage boot loader expects u-boot running at this address. */
-#define CONFIG_SYS_TEXT_BASE	0x27000000	/* 16MB available */
 
 /* The first stage boot loader takes care of low level initialization. */
 #define CONFIG_SKIP_LOWLEVEL_INIT
@@ -143,19 +142,12 @@
 /* DHCP/BOOTP options */
 #ifdef CONFIG_CMD_DHCP
 #define CONFIG_BOOTP_BOOTFILESIZE
-#define CONFIG_BOOTP_BOOTPATH
-#define CONFIG_BOOTP_GATEWAY
-#define CONFIG_BOOTP_HOSTNAME
 #define CONFIG_SYS_AUTOLOAD	"n"
 #endif
 
 /* File systems */
 #define CONFIG_MTD_DEVICE
 #define CONFIG_MTD_PARTITIONS
-#if defined(CONFIG_CMD_MTDPARTS) || defined(CONFIG_CMD_NAND)
-#define MTDIDS_DEFAULT		"nand0=atmel_nand"
-#define MTDPARTS_DEFAULT	"mtdparts=atmel_nand:-(root)"
-#endif
 
 /* Boot command */
 #define CONFIG_CMDLINE_TAG
@@ -166,7 +158,5 @@
 				"bootm 0x22000000"
 
 /* Misc. u-boot settings */
-#define CONFIG_SYS_LONGHELP
-#define CONFIG_CMDLINE_EDITING
 
 #endif

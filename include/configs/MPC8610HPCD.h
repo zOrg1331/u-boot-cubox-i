@@ -14,8 +14,6 @@
 /* High Level Configuration Options */
 #define CONFIG_LINUX_RESET_VEC	0x100	/* Reset vector used by Linux */
 
-#define	CONFIG_SYS_TEXT_BASE	0xfff00000
-
 /* video */
 #define CONFIG_FSL_DIU_FB
 
@@ -281,10 +279,7 @@
 #define PCI_IDSEL_NUMBER	0x0c	/* slot0->3(IDSEL)=12->15 */
 #endif
 
-#define CONFIG_SCSI_AHCI
-
 #ifdef CONFIG_SCSI_AHCI
-#define CONFIG_LIBATA
 #define CONFIG_SATA_ULI5288
 #define CONFIG_SYS_SCSI_MAX_SCSI_ID	4
 #define CONFIG_SYS_SCSI_MAX_LUN	1
@@ -415,9 +410,6 @@
  * BOOTP options
  */
 #define CONFIG_BOOTP_BOOTFILESIZE
-#define CONFIG_BOOTP_BOOTPATH
-#define CONFIG_BOOTP_GATEWAY
-#define CONFIG_BOOTP_HOSTNAME
 
 /*
  * Command line configuration.
@@ -429,8 +421,6 @@
 /*
  * Miscellaneous configurable options
  */
-#define CONFIG_SYS_LONGHELP			/* undef to save memory	*/
-#define CONFIG_CMDLINE_EDITING          /* Command-line editing */
 #define CONFIG_SYS_LOAD_ADDR	0x2000000	/* default load address */
 
 /*

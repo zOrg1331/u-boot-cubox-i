@@ -52,7 +52,6 @@
 #define CONFIG_PHY_ATHEROS
 
 #ifdef CONFIG_CMD_SF
-#define CONFIG_MXC_SPI
 #define CONFIG_SF_DEFAULT_BUS		0
 #define CONFIG_SF_DEFAULT_CS		0
 #define CONFIG_SF_DEFAULT_SPEED		20000000
@@ -108,11 +107,9 @@
 #define CONFIG_BMP_16BPP
 #define CONFIG_VIDEO_LOGO
 #define CONFIG_VIDEO_BMP_LOGO
-#define CONFIG_IPUV3_CLK 260000000
 #define CONFIG_IMX_HDMI
 #define CONFIG_IMX_VIDEO_SKIP
 
-#include <config_distro_defaults.h>
 #include "mx6_common.h"
 
 /* 256M RAM (minimum), 32M uncompressed kernel, 16M compressed kernel, 1M fdt,
@@ -132,10 +129,6 @@
 	func(USB, usb, 0) \
 	func(PXE, pxe, na) \
 	func(DHCP, dhcp, na)
-
-#define CONFIG_BOOTCOMMAND \
-	"run finduuid; " \
-	"run distro_bootcmd"
 
 #include <config_distro_bootcmd.h>
 

@@ -1,6 +1,6 @@
 /*
- * (C) Copyright 2016
- * Vikas Manocha, ST Micoelectronics, vikas.manocha@st.com.
+ * Copyright (C) 2016, STMicroelectronics - All Rights Reserved
+ * Author(s): Vikas Manocha, <vikas.manocha@st.com> for STMicroelectronics.
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
@@ -21,9 +21,7 @@ enum periph_id {
 };
 
 enum periph_clock {
-	SYSCFG_CLOCK_CFG,
 	TIMER2_CLOCK_CFG,
-	STMMAC_CLOCK_CFG,
 };
 
 #endif /* __ASM_ARM_ARCH_PERIPH_H */

@@ -176,7 +176,7 @@ static int bus_i2c_set_bus_speed(struct mxc_i2c_bus *i2c_bus, int speed)
 	int reg_shift = quirk ? VF610_I2C_REGSHIFT : IMX_I2C_REGSHIFT;
 
 	if (!base)
-		return -ENODEV;
+		return -EINVAL;
 
 	/* Store divider value */
 	writeb(idx, base + (IFDR << reg_shift));
@@ -239,7 +239,7 @@ static int tx_byte(struct mxc_i2c_bus *i2c_bus, u8 byte)
 	if (ret < 0)
 		return ret;
 	if (ret & I2SR_RX_NO_AK)
-		return -ENODEV;
+		return -EREMOTEIO;
 	return 0;
 }
 
@@ -317,16 +317,19 @@ static int i2c_init_transfer_(struct mxc_i2c_bus *i2c_bus, u8 chip,
 	temp |= I2CR_MTX | I2CR_TX_NO_AK;
 	writeb(temp, base + (I2CR << reg_shift));
 
-	/* write slave address */
-	ret = tx_byte(i2c_bus, chip << 1);
-	if (ret < 0)
-		return ret;
-
-	while (alen--) {
-		ret = tx_byte(i2c_bus, (addr >> (alen * 8)) & 0xff);
+	if (alen >= 0)	{
+		/* write slave address */
+		ret = tx_byte(i2c_bus, chip << 1);
 		if (ret < 0)
 			return ret;
+
+		while (alen--) {
+			ret = tx_byte(i2c_bus, (addr >> (alen * 8)) & 0xff);
+			if (ret < 0)
+				return ret;
+		}
 	}
+
 	return 0;
 }
 
@@ -418,14 +421,14 @@ static int i2c_init_transfer(struct mxc_i2c_bus *i2c_bus, u8 chip,
 			VF610_I2C_REGSHIFT : IMX_I2C_REGSHIFT;
 
 	if (!i2c_bus->base)
-		return -ENODEV;
+		return -EINVAL;
 
 	for (retry = 0; retry < 3; retry++) {
 		ret = i2c_init_transfer_(i2c_bus, chip, addr, alen);
 		if (ret >= 0)
 			return 0;
 		i2c_imx_stop(i2c_bus);
-		if (ret == -ENODEV)
+		if (ret == -EREMOTEIO)
 			return ret;
 
 		printf("%s: failed for chip 0x%x retry=%d\n", __func__, chip,
@@ -537,9 +540,11 @@ static int bus_i2c_read(struct mxc_i2c_bus *i2c_bus, u8 chip, u32 addr,
 	if (ret < 0)
 		return ret;
 
-	temp = readb(base + (I2CR << reg_shift));
-	temp |= I2CR_RSTA;
-	writeb(temp, base + (I2CR << reg_shift));
+	if (alen >= 0) {
+		temp = readb(base + (I2CR << reg_shift));
+		temp |= I2CR_RSTA;
+		writeb(temp, base + (I2CR << reg_shift));
+	}
 
 	ret = tx_byte(i2c_bus, (chip << 1) | 1);
 	if (ret < 0) {
@@ -754,7 +759,7 @@ static int mxc_i2c_probe(struct udevice *bus)
 
 	addr = devfdt_get_addr(bus);
 	if (addr == FDT_ADDR_T_NONE)
-		return -ENODEV;
+		return -EINVAL;
 
 	i2c_bus->base = addr;
 	i2c_bus->index = bus->seq;
@@ -779,11 +784,11 @@ static int mxc_i2c_probe(struct udevice *bus)
 		ret2 = gpio_request_by_name_nodev(offset_to_ofnode(node),
 				"sda-gpios", 0, &i2c_bus->sda_gpio,
 				GPIOD_IS_OUT);
-		if (!dm_gpio_is_valid(&i2c_bus->sda_gpio) |
-		    !dm_gpio_is_valid(&i2c_bus->scl_gpio) |
-		    ret | ret2) {
+		if (!dm_gpio_is_valid(&i2c_bus->sda_gpio) ||
+		    !dm_gpio_is_valid(&i2c_bus->scl_gpio) ||
+		    ret || ret2) {
 			dev_err(dev, "i2c bus %d at %lu, fail to request scl/sda gpio\n", bus->seq, i2c_bus->base);
-			return -ENODEV;
+			return -EINVAL;
 		}
 	}
 

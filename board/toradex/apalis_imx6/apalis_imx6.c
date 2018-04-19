@@ -29,8 +29,8 @@
 #include <dm/platform_data/serial_mxc.h>
 #include <dm/platdata.h>
 #include <fsl_esdhc.h>
-#include <g_dnl.h>
 #include <i2c.h>
+#include <input.h>
 #include <imx_thermal.h>
 #include <linux/errno.h>
 #include <malloc.h>
@@ -757,10 +757,6 @@ int board_early_init_f(void)
 #else
 	setup_iomux_dce_uart();
 #endif
-
-#if defined(CONFIG_VIDEO_IPUV3)
-	setup_display();
-#endif
 	return 0;
 }
 
@@ -781,6 +777,10 @@ int board_init(void)
 	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info1);
 	setup_i2c(1, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info_loc);
 	setup_i2c(2, CONFIG_SYS_I2C_SPEED, 0x7f, &i2c_pad_info3);
+
+#if defined(CONFIG_VIDEO_IPUV3)
+	setup_display();
+#endif
 
 #ifdef CONFIG_TDX_CMD_IMX_MFGR
 	(void) pmic_init();
@@ -892,7 +892,7 @@ void ldo_mode_set(int ldo_bypass)
 
 #ifdef CONFIG_SPL_BUILD
 #include <spl.h>
-#include <libfdt.h>
+#include <linux/libfdt.h>
 #include "asm/arch/mx6q-ddr.h"
 #include "asm/arch/iomux.h"
 #include "asm/arch/crm_regs.h"
@@ -1223,18 +1223,6 @@ void board_init_f(ulong dummy)
 void reset_cpu(ulong addr)
 {
 }
-
-#ifdef CONFIG_SPL_USB_GADGET_SUPPORT
-int g_dnl_bind_fixup(struct usb_device_descriptor *dev, const char *name)
-{
-	unsigned short usb_pid;
-
-	usb_pid = TORADEX_USB_PRODUCT_NUM_OFFSET + 0xfff;
-	put_unaligned(usb_pid, &dev->idProduct);
-
-	return 0;
-}
-#endif
 
 #endif
 

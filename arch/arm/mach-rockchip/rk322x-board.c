@@ -7,6 +7,7 @@
 #include <clk.h>
 #include <dm.h>
 #include <ram.h>
+#include <syscon.h>
 #include <asm/io.h>
 #include <asm/arch/clock.h>
 #include <asm/arch/periph.h>
@@ -14,30 +15,6 @@
 #include <asm/arch/boot_mode.h>
 
 DECLARE_GLOBAL_DATA_PTR;
-
-#define GRF_BASE	0x11000000
-
-static void setup_boot_mode(void)
-{
-	struct rk322x_grf *const grf = (void *)GRF_BASE;
-	int boot_mode = readl(&grf->os_reg[4]);
-
-	debug("boot mode %x.\n", boot_mode);
-
-	/* Clear boot mode */
-	writel(BOOT_NORMAL, &grf->os_reg[4]);
-
-	switch (boot_mode) {
-	case BOOT_FASTBOOT:
-		printf("enter fastboot!\n");
-		env_set("preboot", "setenv preboot; fastboot usb0");
-		break;
-	case BOOT_UMS:
-		printf("enter UMS!\n");
-		env_set("preboot", "setenv preboot; ums mmc 0");
-		break;
-	}
-}
 
 __weak int rk_board_late_init(void)
 {
@@ -57,6 +34,24 @@ int board_init(void)
 	/* Enable early UART2 channel 1 on the RK322x */
 #define GRF_BASE	0x11000000
 	struct rk322x_grf * const grf = (void *)GRF_BASE;
+	enum {
+		GPIO1B2_SHIFT		= 4,
+		GPIO1B2_MASK		= 3 << GPIO1B2_SHIFT,
+		GPIO1B2_GPIO		= 0,
+		GPIO1B2_UART21_SIN,
+
+		GPIO1B1_SHIFT		= 2,
+		GPIO1B1_MASK		= 3 << GPIO1B1_SHIFT,
+		GPIO1B1_GPIO            = 0,
+		GPIO1B1_UART1_SOUT,
+		GPIO1B1_UART21_SOUT,
+	};
+	enum {
+		CON_IOMUX_UART2SEL_SHIFT= 8,
+		CON_IOMUX_UART2SEL_MASK	= 1 << CON_IOMUX_UART2SEL_SHIFT,
+		CON_IOMUX_UART2SEL_2	= 0,
+		CON_IOMUX_UART2SEL_21,
+	};
 
 	rk_clrsetreg(&grf->gpio1b_iomux,
 		     GPIO1B1_MASK | GPIO1B2_MASK,
@@ -66,6 +61,14 @@ int board_init(void)
 	rk_clrsetreg(&grf->con_iomux,
 		     CON_IOMUX_UART2SEL_MASK,
 		     CON_IOMUX_UART2SEL_21 << CON_IOMUX_UART2SEL_SHIFT);
+
+	/*
+	* The integrated macphy is enabled by default, disable it
+	* for saving power consuming.
+	*/
+	rk_clrsetreg(&grf->macphy_con[0],
+		     MACPHY_CFG_ENABLE_MASK,
+		     0 << MACPHY_CFG_ENABLE_SHIFT);
 
 	return 0;
 }
@@ -133,6 +136,20 @@ int board_usb_init(int index, enum usb_init_type init)
 
 int board_usb_cleanup(int index, enum usb_init_type init)
 {
+	return 0;
+}
+#endif
+
+#if defined(CONFIG_USB_FUNCTION_FASTBOOT)
+int fb_set_reboot_flag(void)
+{
+	struct rk322x_grf *grf;
+
+	printf("Setting reboot to fastboot flag ...\n");
+	grf = syscon_get_first_range(ROCKCHIP_SYSCON_GRF);
+	/* Set boot mode to fastboot */
+	writel(BOOT_FASTBOOT, &grf->os_reg[0]);
+
 	return 0;
 }
 #endif

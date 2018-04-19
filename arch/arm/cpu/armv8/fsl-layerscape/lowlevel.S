@@ -37,9 +37,8 @@ ENTRY(get_gic_offset)
 	ldr     x2, =DCFG_CCSR_SVR
 	ldr	w2, [x2]
 	rev	w2, w2
-	mov	w3, w2
-	ands	w3, w3, #SVR_WO_E << 8
-	mov	w4, #SVR_LS1043A << 8
+	lsr	w3, w2, #16
+	ldr	w4, =SVR_DEV(SVR_LS1043A)
 	cmp	w3, w4
 	b.ne	1f
 	ands	w2, w2, #0xff
@@ -76,7 +75,7 @@ ENTRY(lowlevel_init)
 	switch_el x1, 1f, 100f, 100f	/* skip if not in EL3 */
 1:
 
-#ifdef CONFIG_FSL_LSCH3
+#if defined (CONFIG_SYS_FSL_HAS_CCN504)
 
 	/* Set Wuo bit for RN-I 20 */
 #ifdef CONFIG_ARCH_LS2080A
@@ -92,7 +91,7 @@ ENTRY(lowlevel_init)
 	 */
 	bl	get_svr
 	lsr	w0, w0, #16
-	ldr	w1, =SVR_DEV_LS2080A
+	ldr	w1, =SVR_DEV(SVR_LS2080A)
 	cmp	w0, w1
 	b.eq	1f
 
@@ -171,7 +170,7 @@ ENTRY(lowlevel_init)
 	ldr	x0, =CCI_S2_QOS_CONTROL_BASE(20)
 	ldr	x1, =0x00FF000C
 	bl	ccn504_set_qos
-#endif
+#endif /* CONFIG_SYS_FSL_HAS_CCN504 */
 
 #ifdef SMMU_BASE
 	/* Set the SMMU page size in the sACR register */
@@ -224,7 +223,7 @@ ENTRY(lowlevel_init)
 	 */
 	bl	get_svr
 	lsr	w0, w0, #16
-	ldr	w1, =SVR_DEV_LS2080A
+	ldr	w1, =SVR_DEV(SVR_LS2080A)
 	cmp	w0, w1
 	b.eq	1f
 
@@ -338,7 +337,9 @@ get_svr:
 	ldr	x1, =FSL_LSCH3_SVR
 	ldr	w0, [x1]
 	ret
+#endif
 
+#ifdef CONFIG_SYS_FSL_HAS_CCN504
 hnf_pstate_poll:
 	/* x0 has the desired status, return 0 for success, 1 for timeout
 	 * clobber x1, x2, x3, x4, x6, x7
@@ -394,9 +395,6 @@ ENTRY(__asm_flush_l3_dcache)
 	mov	x29, lr
 	mov	x8, #0
 
-	switch_el x0, 1f, 100f, 100f	/* skip if not in EL3 */
-
-1:
 	dsb	sy
 	mov	x0, #0x1		/* HNFPSTAT_SFONLY */
 	bl	hnf_set_pstate
@@ -414,13 +412,12 @@ ENTRY(__asm_flush_l3_dcache)
 	bl	hnf_pstate_poll
 	cbz	x0, 1f
 	add	x8, x8, #0x2
-100:
 1:
 	mov	x0, x8
 	mov	lr, x29
 	ret
 ENDPROC(__asm_flush_l3_dcache)
-#endif
+#endif /* CONFIG_SYS_FSL_HAS_CCN504 */
 
 #ifdef CONFIG_MP
 	/* Keep literals not used by the secondary boot code outside it */

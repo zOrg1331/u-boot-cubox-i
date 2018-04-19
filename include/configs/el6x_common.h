@@ -11,7 +11,6 @@
 
 #define CONFIG_BOARD_NAME		EL6Q
 
-#include <config_distro_defaults.h>
 #include "mx6_common.h"
 
 #define CONFIG_IMX_THERMAL
@@ -46,7 +45,6 @@
 #define CONFIG_POWER_PFUZE100_I2C_ADDR	0x08
 
 /* Commands */
-#define CONFIG_MXC_SPI
 #define CONFIG_SF_DEFAULT_BUS		3
 #define CONFIG_SF_DEFAULT_CS		0
 #define CONFIG_SF_DEFAULT_SPEED		20000000
@@ -55,9 +53,6 @@
 /* allow to overwrite serial and ethaddr */
 #define CONFIG_ENV_OVERWRITE
 #define CONFIG_MXC_UART_BASE	UART2_BASE
-
-/* Command definition */
-#undef CONFIG_CMD_IMLS
 
 #define CONFIG_BOARD_NAME	EL6Q
 
@@ -82,10 +77,6 @@
 	func(MMC, mmc, 1) \
 	func(PXE, PXE, na) \
 	func(DHCP, dhcp, na)
-
-#define CONFIG_BOOTCOMMAND \
-	   "run findfdt; " \
-	   "run distro_bootcmd"
 
 #include <config_distro_bootcmd.h>
 

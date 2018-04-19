@@ -8,7 +8,6 @@
 #define __CONFIGS_M28EVK_H__
 
 /* System configurations */
-#define CONFIG_MX28				/* i.MX28 SoC */
 #define CONFIG_MACH_TYPE	MACH_TYPE_M28EVK
 
 #define CONFIG_TIMESTAMP		/* Print image info with timestamp */
@@ -33,15 +32,6 @@
 
 #define CONFIG_MTD_DEVICE
 #define CONFIG_MTD_PARTITIONS
-#define MTDIDS_DEFAULT			"nand0=gpmi-nand"
-#define MTDPARTS_DEFAULT			\
-	"mtdparts=gpmi-nand:"			\
-		"3m(u-boot),"			\
-		"512k(env1),"			\
-		"512k(env2),"			\
-		"14m(boot),"			\
-		"238m(data),"			\
-		"-@4096k(UBI)"
 #endif
 
 /* FEC Ethernet on SoC */
@@ -72,7 +62,6 @@
 /* SPI */
 #ifdef CONFIG_CMD_SPI
 #define CONFIG_DEFAULT_SPI_BUS		2
-#define CONFIG_DEFAULT_SPI_CS		0
 #define CONFIG_DEFAULT_SPI_MODE		SPI_MODE_0
 
 /* SPI FLASH */

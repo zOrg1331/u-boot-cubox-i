@@ -14,11 +14,14 @@
 #define CONFIG_SYS_USE_SERIALFLASH	1
 #define CONFIG_BOARD_LATE_INIT
 
+/* Timer */
+#define CONFIG_SYS_TIMER_COUNTER	0xfc06863c
+
 /*
  * Memory configurations
  */
 #define CONFIG_NR_DRAM_BANKS		1
-#define CONFIG_SYS_SDRAM_BASE           ATMEL_BASE_DDRCS
+#define CONFIG_SYS_SDRAM_BASE		0x20000000
 #define CONFIG_SYS_SDRAM_SIZE		0x10000000
 
 #ifdef CONFIG_SPL_BUILD
@@ -45,8 +48,8 @@
  * Serial Driver
  */
 #define CONFIG_ATMEL_USART
-#define CONFIG_USART_BASE		ATMEL_BASE_USART0
-#define CONFIG_USART_ID			ATMEL_ID_USART0
+#define CONFIG_USART_BASE		0xf802c000
+#define CONFIG_USART_ID			6
 
 /*
  * Ethernet
@@ -97,10 +100,6 @@
 #ifdef CONFIG_CMD_USB
 
 /* USB device */
-#define CONFIG_USB_ETHER
-#define CONFIG_USB_ETH_RNDIS
-#define CONFIG_USBNET_MANUFACTURER      "AriesEmbedded"
-#define CONFIG_USB_FUNCTION_MASS_STORAGE
 #define CONFIG_SYS_DFU_DATA_BUF_SIZE	(1 * 1024 * 1024)
 #define DFU_DEFAULT_POLL_TIMEOUT	300
 #endif
@@ -198,7 +197,6 @@
 		"fi ; "							\
 		"fi\0"
 /* SPL */
-#define CONFIG_SPL_FRAMEWORK
 #define CONFIG_SPL_TEXT_BASE		0x200000
 #define CONFIG_SPL_MAX_SIZE		0x10000
 #define CONFIG_SPL_BSS_START_ADDR	0x20000000

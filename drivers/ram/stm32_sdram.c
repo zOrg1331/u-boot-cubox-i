@@ -1,6 +1,6 @@
 /*
- * (C) Copyright 2017
- * Vikas Manocha, <vikas.manocha@st.com>
+ * Copyright (C) 2017, STMicroelectronics - All Rights Reserved
+ * Author(s): Vikas Manocha, <vikas.manocha@st.com> for STMicroelectronics.
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
@@ -10,6 +10,9 @@
 #include <dm.h>
 #include <ram.h>
 #include <asm/io.h>
+
+#define MEM_MODE_MASK	GENMASK(2, 0)
+#define NOT_FOUND	0xff
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -253,16 +256,38 @@ static int stm32_fmc_ofdata_to_platdata(struct udevice *dev)
 {
 	struct stm32_sdram_params *params = dev_get_platdata(dev);
 	struct bank_params *bank_params;
+	struct ofnode_phandle_args args;
+	u32 *syscfg_base;
+	u32 mem_remap;
 	ofnode bank_node;
 	char *bank_name;
 	u8 bank = 0;
+	int ret;
+
+	mem_remap = dev_read_u32_default(dev, "st,mem_remap", NOT_FOUND);
+	if (mem_remap != NOT_FOUND) {
+		ret = dev_read_phandle_with_args(dev, "st,syscfg", NULL, 0, 0,
+						 &args);
+		if (ret) {
+			debug("%s: can't find syscon device (%d)\n", __func__,
+			      ret);
+			return ret;
+		}
+
+		syscfg_base = (u32 *)ofnode_get_addr(args.node);
+
+		/* set memory mapping selection */
+		clrsetbits_le32(syscfg_base, MEM_MODE_MASK, mem_remap);
+	} else {
+		debug("%s: cannot find st,mem_remap property\n", __func__);
+	}
 
 	dev_for_each_subnode(bank_node, dev) {
 		/* extract the bank index from DT */
 		bank_name = (char *)ofnode_get_name(bank_node);
 		strsep(&bank_name, "@");
 		if (!bank_name) {
-			error("missing sdram bank index");
+			pr_err("missing sdram bank index");
 			return -EINVAL;
 		}
 
@@ -271,7 +296,7 @@ static int stm32_fmc_ofdata_to_platdata(struct udevice *dev)
 			       (long unsigned int *)&bank_params->target_bank);
 
 		if (bank_params->target_bank >= MAX_SDRAM_BANK) {
-			error("Found bank %d , but only bank 0 and 1 are supported",
+			pr_err("Found bank %d , but only bank 0 and 1 are supported",
 			      bank_params->target_bank);
 			return -EINVAL;
 		}
@@ -285,7 +310,7 @@ static int stm32_fmc_ofdata_to_platdata(struct udevice *dev)
 						  sizeof(struct stm32_sdram_control));
 
 		if (!params->bank_params[bank].sdram_control) {
-			error("st,sdram-control not found for %s",
+			pr_err("st,sdram-control not found for %s",
 			      ofnode_get_name(bank_node));
 			return -EINVAL;
 		}
@@ -298,7 +323,7 @@ static int stm32_fmc_ofdata_to_platdata(struct udevice *dev)
 						  sizeof(struct stm32_sdram_timing));
 
 		if (!params->bank_params[bank].sdram_timing) {
-			error("st,sdram-timing not found for %s",
+			pr_err("st,sdram-timing not found for %s",
 			      ofnode_get_name(bank_node));
 			return -EINVAL;
 		}

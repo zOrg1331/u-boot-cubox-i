@@ -20,7 +20,6 @@
  */
 #define CONFIG_FEROCEON_88FR131	1	/* CPU Core subversion */
 #define CONFIG_KW88F6281	1	/* SOC Name */
-#define CONFIG_MACH_GOFLEXHOME		/* Machine type */
 #define CONFIG_SKIP_LOWLEVEL_INIT	/* disable board lowlevel_init */
 
 /*
@@ -75,13 +74,10 @@
 	"ubifsload 0x800000 ${kernel}; " \
 	"bootm 0x800000"
 
-#define CONFIG_MTDPARTS \
-	"mtdparts=orion_nand:1m(uboot),6M(uImage),-(root)\0"
-
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"console=console=ttyS0,115200\0" \
 	"mtdids=nand0=orion_nand\0" \
-	"mtdparts="CONFIG_MTDPARTS \
+	"mtdparts="CONFIG_MTDPARTS_DEFAULT \
 	"kernel=/boot/uImage\0" \
 	"bootargs_root=ubi.mtd=root root=ubi0:root rootfstype=ubifs ro\0"
 

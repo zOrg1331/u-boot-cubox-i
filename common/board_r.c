@@ -18,9 +18,6 @@
 #endif
 #include <command.h>
 #include <console.h>
-#ifdef CONFIG_HAS_DATAFLASH
-#include <dataflash.h>
-#endif
 #include <dm.h>
 #include <environment.h>
 #include <fdtdec.h>
@@ -33,7 +30,6 @@
 #if defined(CONFIG_CMD_KGDB)
 #include <kgdb.h>
 #endif
-#include <logbuff.h>
 #include <malloc.h>
 #include <mapmem.h>
 #ifdef CONFIG_BITBANGMII
@@ -130,7 +126,7 @@ static int initr_reloc_global_data(void)
 {
 #ifdef __ARM__
 	monitor_flash_len = _end - __image_copy_start;
-#elif defined(CONFIG_NDS32)
+#elif defined(CONFIG_NDS32) || defined(CONFIG_RISCV)
 	monitor_flash_len = (ulong)&_end - (ulong)&_start;
 #elif !defined(CONFIG_SANDBOX) && !defined(CONFIG_NIOS2)
 	monitor_flash_len = (ulong)&__init_end - gd->relocaddr;
@@ -161,9 +157,9 @@ static int initr_reloc_global_data(void)
 #endif
 #ifdef CONFIG_OF_EMBED
 	/*
-	* The fdt_blob needs to be moved to new relocation address
-	* incase of FDT blob is embedded with in image
-	*/
+	 * The fdt_blob needs to be moved to new relocation address
+	 * incase of FDT blob is embedded with in image
+	 */
 	gd->fdt_blob += gd->reloc_off;
 #endif
 #ifdef CONFIG_EFI_LOADER
@@ -199,19 +195,6 @@ static int initr_addr_map(void)
 {
 	init_addr_map();
 
-	return 0;
-}
-#endif
-
-#ifdef CONFIG_LOGBUFFER
-unsigned long logbuffer_base(void)
-{
-	return gd->ram_top - LOGBUFF_LEN;
-}
-
-static int initr_logbuffer(void)
-{
-	logbuff_init_ptrs();
 	return 0;
 }
 #endif
@@ -368,14 +351,16 @@ static int initr_flash(void)
 	print_size(flash_size, "");
 #ifdef CONFIG_SYS_FLASH_CHECKSUM
 	/*
-	* Compute and print flash CRC if flashchecksum is set to 'y'
-	*
-	* NOTE: Maybe we should add some WATCHDOG_RESET()? XXX
-	*/
+	 * Compute and print flash CRC if flashchecksum is set to 'y'
+	 *
+	 * NOTE: Maybe we should add some WATCHDOG_RESET()? XXX
+	 */
 	if (env_get_yesno("flashchecksum") == 1) {
+		const uchar *flash_base = (const uchar *)CONFIG_SYS_FLASH_BASE;
+
 		printf("  CRC: %08X", crc32(0,
-			(const unsigned char *) CONFIG_SYS_FLASH_BASE,
-			flash_size));
+					    flash_base,
+					    flash_size));
 	}
 #endif /* CONFIG_SYS_FLASH_CHECKSUM */
 	putc('\n');
@@ -391,7 +376,6 @@ static int initr_flash(void)
 	/* Make a update of the Memctrl. */
 	update_flash_size(flash_size);
 #endif
-
 
 #if defined(CONFIG_OXC) || defined(CONFIG_RMU)
 	/* flash mapped at end of memory map */
@@ -443,15 +427,6 @@ static int initr_mmc(void)
 {
 	puts("MMC:   ");
 	mmc_initialize(gd->bd);
-	return 0;
-}
-#endif
-
-#ifdef CONFIG_HAS_DATAFLASH
-static int initr_dataflash(void)
-{
-	AT91F_DataflashInit();
-	dataflash_print_info();
 	return 0;
 }
 #endif
@@ -640,7 +615,7 @@ static int initr_ide(void)
 }
 #endif
 
-#if defined(CONFIG_PRAM) || defined(CONFIG_LOGBUFFER)
+#if defined(CONFIG_PRAM)
 /*
  * Export available size of memory for Linux, taking into account the
  * protected RAM at top of memory
@@ -650,14 +625,8 @@ int initr_mem(void)
 	ulong pram = 0;
 	char memsz[32];
 
-# ifdef CONFIG_PRAM
 	pram = env_get_ulong("pram", 10, CONFIG_PRAM);
-# endif
-# if defined(CONFIG_LOGBUFFER) && !defined(CONFIG_ALT_LB_ADDR)
-	/* Also take the logbuffer into account (pram is in kB) */
-	pram += (LOGBUFF_LEN + LOGBUFF_OVERHEAD) / 1024;
-# endif
-	sprintf(memsz, "%ldk", (long int) ((gd->ram_size / 1024) - pram));
+	sprintf(memsz, "%ldk", (long int)((gd->ram_size / 1024) - pram));
 	env_set("mem", memsz);
 
 	return 0;
@@ -695,7 +664,7 @@ static int run_main_loop(void)
 
 /*
  * Over time we hope to remove these functions with code fragments and
- * stub funtcions, and instead call the relevant function directly.
+ * stub functions, and instead call the relevant function directly.
  *
  * We also hope to remove most of the driver-related init and do it if/when
  * the driver is later used.
@@ -710,7 +679,7 @@ static init_fnc_t init_sequence_r[] = {
 	initr_caches,
 	/* Note: For Freescale LS2 SoCs, new MMU table is created in DDR.
 	 *	 A temporary mapping of IFC high region is since removed,
-	 *	 so environmental variables in NOR flash is not availble
+	 *	 so environmental variables in NOR flash is not available
 	 *	 until board_init() is called below to remap IFC to high
 	 *	 region.
 	 */
@@ -721,6 +690,7 @@ static init_fnc_t init_sequence_r[] = {
 #endif
 	initr_barrier,
 	initr_malloc,
+	log_init,
 	initr_bootstage,	/* Needs malloc() but has its own timer */
 	initr_console_record,
 #ifdef CONFIG_SYS_NONCACHED_MEMORY
@@ -733,7 +703,7 @@ static init_fnc_t init_sequence_r[] = {
 #ifdef CONFIG_DM
 	initr_dm,
 #endif
-#if defined(CONFIG_ARM) || defined(CONFIG_NDS32)
+#if defined(CONFIG_ARM) || defined(CONFIG_NDS32) || defined(CONFIG_RISCV)
 	board_init,	/* Setup chipselects */
 #endif
 	/*
@@ -765,9 +735,6 @@ static init_fnc_t init_sequence_r[] = {
 	board_early_init_r,
 #endif
 	INIT_FUNC_WATCHDOG_RESET
-#ifdef CONFIG_LOGBUFFER
-	initr_logbuffer,
-#endif
 #ifdef CONFIG_POST
 	initr_post_backlog,
 #endif
@@ -775,7 +742,7 @@ static init_fnc_t init_sequence_r[] = {
 #if defined(CONFIG_PCI) && defined(CONFIG_SYS_EARLY_PCI_INIT)
 	/*
 	 * Do early PCI configuration _before_ the flash gets initialised,
-	 * because PCU ressources are crucial for flash access on some boards.
+	 * because PCU resources are crucial for flash access on some boards.
 	 */
 	initr_pci,
 #endif
@@ -802,9 +769,6 @@ static init_fnc_t init_sequence_r[] = {
 #endif
 #ifdef CONFIG_MMC
 	initr_mmc,
-#endif
-#ifdef CONFIG_HAS_DATAFLASH
-	initr_dataflash,
 #endif
 	initr_env,
 #ifdef CONFIG_SYS_BOOTPARAMS_LEN
@@ -892,7 +856,7 @@ static init_fnc_t init_sequence_r[] = {
 	INIT_FUNC_WATCHDOG_RESET
 	initr_bedbug,
 #endif
-#if defined(CONFIG_PRAM) || defined(CONFIG_LOGBUFFER)
+#if defined(CONFIG_PRAM)
 	initr_mem,
 #endif
 #ifdef CONFIG_PS2KBD
@@ -920,6 +884,7 @@ void board_init_r(gd_t *new_gd, ulong dest_addr)
 #if !defined(CONFIG_X86) && !defined(CONFIG_ARM) && !defined(CONFIG_ARM64)
 	gd = new_gd;
 #endif
+	gd->flags &= ~GD_FLG_LOG_READY;
 
 #ifdef CONFIG_NEEDS_MANUAL_RELOC
 	for (i = 0; i < ARRAY_SIZE(init_sequence_r); i++)

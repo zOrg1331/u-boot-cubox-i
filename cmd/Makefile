@@ -27,6 +27,7 @@ obj-$(CONFIG_CMD_BOOTMENU) += bootmenu.o
 obj-$(CONFIG_CMD_BOOTSTAGE) += bootstage.o
 obj-$(CONFIG_CMD_BOOTZ) += bootz.o
 obj-$(CONFIG_CMD_BOOTI) += booti.o
+obj-$(CONFIG_CMD_BTRFS) += btrfs.o
 obj-$(CONFIG_CMD_CACHE) += cache.o
 obj-$(CONFIG_CMD_CBFS) += cbfs.o
 obj-$(CONFIG_CMD_CLK) += clk.o
@@ -54,9 +55,7 @@ obj-$(CONFIG_CMD_FDC) += fdc.o
 obj-$(CONFIG_CMD_FDT) += fdt.o
 obj-$(CONFIG_CMD_FITUPD) += fitupd.o
 obj-$(CONFIG_CMD_FLASH) += flash.o
-ifdef CONFIG_FPGA
 obj-$(CONFIG_CMD_FPGA) += fpga.o
-endif
 obj-$(CONFIG_CMD_FPGAD) += fpgad.o
 obj-$(CONFIG_CMD_FS_GENERIC) += fs.o
 obj-$(CONFIG_CMD_FUSE) += fuse.o
@@ -75,7 +74,7 @@ obj-$(CONFIG_LED_STATUS_CMD) += legacy_led.o
 obj-$(CONFIG_CMD_LED) += led.o
 obj-$(CONFIG_CMD_LICENSE) += license.o
 obj-y += load.o
-obj-$(CONFIG_LOGBUFFER) += log.o
+obj-$(CONFIG_CMD_LOG) += log.o
 obj-$(CONFIG_ID_EEPROM) += mac.o
 obj-$(CONFIG_CMD_MD5SUM) += md5sum.o
 obj-$(CONFIG_CMD_MEMORY) += mem.o
@@ -104,6 +103,7 @@ obj-$(CONFIG_CMD_READ) += read.o
 obj-$(CONFIG_CMD_REGINFO) += reginfo.o
 obj-$(CONFIG_CMD_REISER) += reiser.o
 obj-$(CONFIG_CMD_REMOTEPROC) += remoteproc.o
+obj-$(CONFIG_CMD_ROCKUSB) += rockusb.o
 obj-$(CONFIG_SANDBOX) += host.o
 obj-$(CONFIG_CMD_SATA) += sata.o
 obj-$(CONFIG_CMD_NVME) += nvme.o
@@ -149,12 +149,15 @@ obj-$(CONFIG_CMD_PMIC) += pmic.o
 obj-$(CONFIG_CMD_REGULATOR) += regulator.o
 
 obj-$(CONFIG_CMD_BLOB) += blob.o
+
+obj-$(CONFIG_X86) += x86/
 endif # !CONFIG_SPL_BUILD
 
 # core command
 obj-y += nvedit.o
 
 obj-$(CONFIG_ARCH_MVEBU) += mvebu/
+obj-$(CONFIG_TI_COMMON_CMD_OPTIONS) += ti/
 
 filechk_data_gz = (echo "static const char data_gz[] ="; cat $< | scripts/bin2c; echo ";")
 

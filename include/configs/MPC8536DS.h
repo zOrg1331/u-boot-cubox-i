@@ -15,18 +15,12 @@
 
 #ifdef CONFIG_SDCARD
 #define CONFIG_RAMBOOT_SDCARD		1
-#define CONFIG_SYS_TEXT_BASE	0xf8f40000
 #define CONFIG_RESET_VECTOR_ADDRESS	0xf8fffffc
 #endif
 
 #ifdef CONFIG_SPIFLASH
 #define CONFIG_RAMBOOT_SPIFLASH		1
-#define CONFIG_SYS_TEXT_BASE	0xf8f40000
 #define CONFIG_RESET_VECTOR_ADDRESS	0xf8fffffc
-#endif
-
-#ifndef CONFIG_SYS_TEXT_BASE
-#define CONFIG_SYS_TEXT_BASE	0xeff40000
 #endif
 
 #ifndef	CONFIG_RESET_VECTOR_ADDRESS
@@ -69,7 +63,6 @@
 
 #define CONFIG_SYS_MEMTEST_START 0x00010000	/* skip exception vectors */
 #define CONFIG_SYS_MEMTEST_END   0x1f000000	/* skip u-boot at top of RAM */
-#define CONFIG_PANIC_HANG	/* do not reset board on panic */
 
 /*
  * Config the L2 Cache as L2 SRAM
@@ -508,9 +501,6 @@
 #endif	/* CONFIG_PCI */
 
 /* SATA */
-#define CONFIG_LIBATA
-#define CONFIG_FSL_SATA
-
 #define CONFIG_SYS_SATA_MAX_DEVICE	2
 #define CONFIG_SATA1
 #define CONFIG_SYS_SATA1		CONFIG_SYS_MPC85xx_SATA1_ADDR
@@ -599,9 +589,6 @@
 /*
  * Miscellaneous configurable options
  */
-#define CONFIG_SYS_LONGHELP			/* undef to save memory	*/
-#define CONFIG_CMDLINE_EDITING			/* Command-line editing */
-#define CONFIG_AUTO_COMPLETE			/* add autocompletion support */
 #define CONFIG_SYS_LOAD_ADDR	0x2000000	/* default load address */
 
 /*

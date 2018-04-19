@@ -30,7 +30,6 @@
 #define V2M_SERIAL_BUS_PCI	(V2M_PA_CS7 + V2M_PERIPH_OFFSET(2))
 
 #define V2M_BASE		0x60000000
-#define CONFIG_SYS_TEXT_BASE	0x60800000
 #elif defined(CONFIG_VEXPRESS_EXTENDED_MEMORY_MAP)
 /* CS register bases for the extended memory map. */
 #define V2M_PA_CS0		0x08000000
@@ -45,7 +44,6 @@
 #define V2M_SERIAL_BUS_PCI	(V2M_PA_CS7 + V2M_PERIPH_OFFSET(3))
 
 #define V2M_BASE		0x80000000
-#define CONFIG_SYS_TEXT_BASE	0x80800000
 #endif
 
 /*
@@ -55,7 +53,6 @@
 #define V2M_NOR1		(V2M_PA_CS1)
 #define V2M_SRAM		(V2M_PA_CS2)
 #define V2M_VIDEO_SRAM		(V2M_PA_CS3 + 0x00000000)
-#define V2M_LAN9118		(V2M_PA_CS3 + 0x02000000)
 #define V2M_ISP1761		(V2M_PA_CS3 + 0x03000000)
 
 /* Common peripherals relative to CS7. */
@@ -133,13 +130,7 @@
 #define CONFIG_SYS_TIMER_COUNTER	(V2M_TIMER01 + 0x4)
 #define CONFIG_SYS_TIMER_COUNTS_DOWN
 
-/* SMSC9115 Ethernet from SMSC9118 family */
-#define CONFIG_SMC911X			1
-#define CONFIG_SMC911X_32_BIT		1
-#define CONFIG_SMC911X_BASE		V2M_LAN9118
-
 /* PL011 Serial Configuration */
-#define CONFIG_PL011_SERIAL
 #define CONFIG_PL011_CLOCK		24000000
 #define CONFIG_PL01x_PORTS		{(void *)CONFIG_SYS_SERIAL0, \
 					 (void *)CONFIG_SYS_SERIAL1}
@@ -156,9 +147,6 @@
 
 /* BOOTP options */
 #define CONFIG_BOOTP_BOOTFILESIZE
-#define CONFIG_BOOTP_BOOTPATH
-#define CONFIG_BOOTP_GATEWAY
-#define CONFIG_BOOTP_HOSTNAME
 
 /* Miscellaneous configurable options */
 #define CONFIG_SYS_LOAD_ADDR		(V2M_BASE + 0x8000)
@@ -180,13 +168,7 @@
 					 GENERATED_GBL_DATA_SIZE)
 #define CONFIG_SYS_INIT_SP_ADDR		CONFIG_SYS_GBL_DATA_OFFSET
 
-#include <config_distro_defaults.h>
-
 /* Basic environment settings */
-#define CONFIG_BOOTCOMMAND \
-	"run distro_bootcmd; " \
-	"run bootflash; "
-
 #define BOOT_TARGET_DEVICES(func) \
         func(MMC, mmc, 1) \
         func(MMC, mmc, 0) \
@@ -273,6 +255,5 @@
 
 /* Monitor Command Prompt */
 #define CONFIG_SYS_CBSIZE		512	/* Console I/O Buffer Size */
-#define CONFIG_SYS_LONGHELP
 
 #endif /* VEXPRESS_COMMON_H */

@@ -9,14 +9,6 @@
 
 #include "ls1043a_common.h"
 
-#if defined(CONFIG_NAND_BOOT) || defined(CONFIG_SD_BOOT)
-#define CONFIG_SYS_TEXT_BASE		0x82000000
-#elif defined(CONFIG_QSPI_BOOT)
-#define CONFIG_SYS_TEXT_BASE		0x40100000
-#else
-#define CONFIG_SYS_TEXT_BASE		0x60100000
-#endif
-
 #ifndef __ASSEMBLY__
 unsigned long get_board_sys_clk(void);
 unsigned long get_board_ddr_clk(void);
@@ -94,8 +86,6 @@ unsigned long get_board_ddr_clk(void);
 #endif
 
 /* SATA */
-#define CONFIG_LIBATA
-#define CONFIG_SCSI_AHCI
 #define CONFIG_SCSI_AHCI_PLAT
 
 /* EEPROM */
@@ -370,19 +360,10 @@ unsigned long get_board_ddr_clk(void);
 #endif
 #endif
 
-/* USB */
-#define CONFIG_HAS_FSL_XHCI_USB
-#ifdef CONFIG_HAS_FSL_XHCI_USB
-#define CONFIG_USB_XHCI_FSL
-#define CONFIG_USB_MAX_CONTROLLER_COUNT		3
-#endif
-
 /*
  * Miscellaneous configurable options
  */
 #define CONFIG_MISC_INIT_R
-#define CONFIG_SYS_LONGHELP		/* undef to save memory */
-#define CONFIG_AUTO_COMPLETE
 
 #define CONFIG_SYS_MEMTEST_START	0x80000000
 #define CONFIG_SYS_MEMTEST_END		0x9fffffff

@@ -16,8 +16,6 @@
 #define CONFIG_MX27
 #define CONFIG_MX27_CLK32	32768		/* OSC32K frequency */
 
-#define CONFIG_SYS_TEXT_BASE		0xc0000000
-
 #define CONFIG_CMDLINE_TAG		1	/* enable passing of ATAGs */
 #define CONFIG_SETUP_MEMORY_TAGS	1
 #define CONFIG_INITRD_TAG		1
@@ -125,7 +123,6 @@
 /*
  * NAND
  */
-#define CONFIG_NAND_MXC
 #define CONFIG_MXC_NAND_REGS_BASE	0xd8000000
 #define CONFIG_SYS_MAX_NAND_DEVICE	1
 #define CONFIG_SYS_NAND_BASE		0xd8000000
@@ -133,18 +130,11 @@
 #define CONFIG_MXC_NAND_HWECC
 
 /*
- * GPIO
- */
-#define CONFIG_MXC_GPIO
-
-/*
  * U-Boot general configuration
  */
 #define CONFIG_SYS_CBSIZE	1024	/* Console I/O Buffer Size  */
 /* Boot Argument Buffer Size */
 #define CONFIG_SYS_BARGSIZE	CONFIG_SYS_CBSIZE
-#define CONFIG_CMDLINE_EDITING
-#define CONFIG_SYS_LONGHELP
 
 #define CONFIG_LOADADDR		0xa0800000	/* loadaddr env var */
 #define CONFIG_SYS_LOAD_ADDR		CONFIG_LOADADDR
@@ -175,8 +165,8 @@
 		" +${filesize};cp.b ${fileaddr} "			\
 		__stringify(CONFIG_SYS_MONITOR_BASE) " ${filesize}\0"	\
 	"upd=run load update\0"						\
-	"mtdids=" MTDIDS_DEFAULT "\0"					\
-	"mtdparts=" MTDPARTS_DEFAULT "\0"				\
+	"mtdids=" CONFIG_MTDIDS_DEFAULT "\0"					\
+	"mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0"				\
 
 /* additions for new relocation code, must be added to all boards */
 #define CONFIG_SYS_SDRAM_BASE		PHYS_SDRAM_1

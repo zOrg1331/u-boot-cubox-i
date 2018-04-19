@@ -11,10 +11,6 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-#ifndef CONFIG_SYS_TEXT_BASE
-#define CONFIG_SYS_TEXT_BASE	0xfff80000
-#endif
-
 #define CONFIG_PCI1		1	/* PCI controller 1 */
 #define CONFIG_PCIE1		1	/* PCIE controller 1 (slot 1) */
 #define CONFIG_PCIE2		1	/* PCIE controller 2 (slot 2) */
@@ -46,7 +42,6 @@ extern unsigned long get_board_sys_clk(unsigned long dummy);
 
 #define CONFIG_SYS_MEMTEST_START	0x00200000	/* memtest works on */
 #define CONFIG_SYS_MEMTEST_END		0x00400000
-#define CONFIG_PANIC_HANG	/* do not reset board on panic */
 
 #define CONFIG_SYS_CCSRBAR		0xe0000000
 #define CONFIG_SYS_CCSRBAR_PHYS_LOW	CONFIG_SYS_CCSRBAR
@@ -282,10 +277,8 @@ extern unsigned long get_board_sys_clk(unsigned long dummy);
 #endif
 
 #define CONFIG_PCI_SCAN_SHOW		/* show pci devices on startup */
-#define CONFIG_SCSI_AHCI
 
 #ifdef CONFIG_SCSI_AHCI
-#define CONFIG_LIBATA
 #define CONFIG_SATA_ULI5288
 #define CONFIG_SYS_SCSI_MAX_SCSI_ID	4
 #define CONFIG_SYS_SCSI_MAX_LUN	1
@@ -338,9 +331,6 @@ extern unsigned long get_board_sys_clk(unsigned long dummy);
  * BOOTP options
  */
 #define CONFIG_BOOTP_BOOTFILESIZE
-#define CONFIG_BOOTP_BOOTPATH
-#define CONFIG_BOOTP_GATEWAY
-#define CONFIG_BOOTP_HOSTNAME
 
 /*
  * USB
@@ -356,9 +346,6 @@ extern unsigned long get_board_sys_clk(unsigned long dummy);
 /*
  * Miscellaneous configurable options
  */
-#define CONFIG_SYS_LONGHELP			/* undef to save memory	*/
-#define CONFIG_CMDLINE_EDITING			/* Command-line editing */
-#define CONFIG_AUTO_COMPLETE			/* add autocompletion support */
 #define CONFIG_SYS_LOAD_ADDR	0x2000000	/* default load address */
 
 /*

@@ -21,9 +21,6 @@
 #include <asm/arch/cpu.h>
 #include <asm/arch/omap.h>
 
-/* The chip has SDRC controller */
-#define CONFIG_SDRC
-
 /* Clock Defines */
 #define V_OSCK			26000000	/* Clock output from T2 */
 #define V_SCLK			(V_OSCK >> 1)
@@ -31,10 +28,12 @@
 /* NS16550 Configuration */
 #define V_NS16550_CLK			48000000	/* 48MHz (APLL96/2) */
 #define CONFIG_SYS_NS16550_CLK		V_NS16550_CLK
-#ifdef CONFIG_SPL_BUILD
-# define CONFIG_SYS_NS16550_SERIAL
-# define CONFIG_SYS_NS16550_REG_SIZE	(-4)
-#endif
+#if defined(CONFIG_SPL_BUILD)
+#define CONFIG_SYS_NS16550_SERIAL
+#if !defined(CONFIG_DM_SERIAL)
+#define CONFIG_SYS_NS16550_REG_SIZE	(-4)
+#endif /* !CONFIG_DM_SERIAL */
+#endif /* CONFIG_SPL_BUILD */
 #define CONFIG_SYS_BAUDRATE_TABLE	{4800, 9600, 19200, 38400, 57600, \
 					115200}
 
@@ -64,7 +63,6 @@
 					 (64 << 20))
 
 #ifdef CONFIG_NAND
-#define CONFIG_SPL_NAND_SIMPLE
 #define CONFIG_SYS_NAND_BASE		0x30000000
 #endif
 

@@ -22,12 +22,7 @@
 #define CONFIG_RAMBOOT_SDCARD
 #define CONFIG_SYS_RAMBOOT
 #define CONFIG_SYS_EXTRA_ENV_RELOC
-#define CONFIG_SYS_TEXT_BASE		0x11000000
 #define CONFIG_RESET_VECTOR_ADDRESS	0x110bfffc
-#endif
-
-#ifndef CONFIG_SYS_TEXT_BASE
-#define CONFIG_SYS_TEXT_BASE		0xeff40000
 #endif
 
 #ifndef CONFIG_RESET_VECTOR_ADDRESS
@@ -50,9 +45,7 @@
 #define CONFIG_TSEC_ENET	/* tsec ethernet support */
 #define CONFIG_ENV_OVERWRITE
 
-#define CONFIG_SATA_SIL3114
 #define CONFIG_SYS_SATA_MAX_DEVICE	2
-#define CONFIG_LIBATA
 #define CONFIG_LBA48
 
 #ifndef __ASSEMBLY__
@@ -71,7 +64,6 @@ extern unsigned long get_board_sys_clk(unsigned long dummy);
 
 #define CONFIG_SYS_MEMTEST_START	0x00200000	/* memtest works on */
 #define CONFIG_SYS_MEMTEST_END		0x1fffffff
-#define CONFIG_PANIC_HANG	/* do not reset board on panic */
 
 #define CONFIG_SYS_CCSRBAR		0xffe00000
 #define CONFIG_SYS_CCSRBAR_PHYS_LOW	CONFIG_SYS_CCSRBAR
@@ -347,10 +339,6 @@ extern unsigned long get_board_sys_clk(unsigned long dummy);
 #define CONFIG_MTD_DEVICE
 #define CONFIG_MTD_PARTITIONS
 #define CONFIG_FLASH_CFI_MTD
-#define MTDIDS_DEFAULT "nor0=ec000000.nor"
-#define MTDPARTS_DEFAULT "mtdparts=ec000000.nor:256k(vsc7385-firmware)," \
-			"256k(dtb),5632k(kernel),57856k(fs)," \
-			"256k(qe-ucode-firmware),1280k(u-boot)"
 
 /*
  * Environment
@@ -394,8 +382,6 @@ extern unsigned long get_board_sys_clk(unsigned long dummy);
 /*
  * Miscellaneous configurable options
  */
-#define CONFIG_SYS_LONGHELP			/* undef to save memory */
-#define CONFIG_CMDLINE_EDITING			/* Command-line editing */
 #define CONFIG_SYS_LOAD_ADDR	0x2000000	/* default load address */
 
 /*

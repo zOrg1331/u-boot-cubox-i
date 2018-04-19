@@ -25,9 +25,16 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#ifdef CONFIG_FMAN_ENET
+__weak int fdt_update_ethernet_dt(void *blob)
+{
+	return 0;
+}
+#endif
+
 int arch_fixup_fdt(void *blob)
 {
-	int ret = 0;
+	__maybe_unused int ret = 0;
 #if defined(CONFIG_ARMV7_NONSEC) || defined(CONFIG_OF_LIBFDT)
 	bd_t *bd = gd->bd;
 	int bank;
@@ -64,5 +71,10 @@ int arch_fixup_fdt(void *blob)
 #endif
 #endif
 
+#ifdef CONFIG_FMAN_ENET
+	ret = fdt_update_ethernet_dt(blob);
+	if (ret)
+		return ret;
+#endif
 	return 0;
 }

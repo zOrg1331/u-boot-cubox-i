@@ -161,7 +161,7 @@ int board_usb_init(int index, enum usb_init_type init)
 		samsung_get_base_usb3_phy();
 
 	if (!phy) {
-		error("usb3 phy not supported");
+		pr_err("usb3 phy not supported");
 		return -ENODEV;
 	}
 
@@ -176,7 +176,7 @@ char *get_dfu_alt_system(char *interface, char *devstr)
 {
 	char *info = "Not supported!";
 
-	if (board_is_odroidxu4())
+	if (board_is_odroidxu4() || board_is_odroidhc1())
 		return info;
 
 	return env_get("dfu_alt_system");
@@ -189,7 +189,7 @@ char *get_dfu_alt_boot(char *interface, char *devstr)
 	char *alt_boot;
 	int dev_num;
 
-	if (board_is_odroidxu4())
+	if (board_is_odroidxu4() || board_is_odroidhc1())
 		return info;
 
 	dev_num = simple_strtoul(devstr, NULL, 10);

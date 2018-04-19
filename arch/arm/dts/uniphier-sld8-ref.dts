@@ -38,7 +38,7 @@
 };
 
 &ethsc {
-	interrupts = <0 48 4>;
+	interrupts = <0 8>;
 };
 
 &serial0 {
@@ -51,6 +51,14 @@
 
 &serial3 {
 	status = "okay";
+};
+
+&gpio {
+	xirq0 {
+		gpio-hog;
+		gpios = <UNIPHIER_GPIO_IRQ(0) 0>;
+		input;
+	};
 };
 
 &i2c0 {
@@ -73,11 +81,6 @@
 	status = "okay";
 };
 
-/* for U-Boot only */
-&serial0 {
-	u-boot,dm-pre-reloc;
-};
-
-&pinctrl_uart0 {
-	u-boot,dm-pre-reloc;
+&nand {
+	status = "okay";
 };

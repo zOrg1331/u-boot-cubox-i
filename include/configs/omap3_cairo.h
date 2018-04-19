@@ -29,7 +29,6 @@
  * other needs.  We use this rather than the inherited defines from
  * ti_armv7_common.h for backwards compatibility.
  */
-#define CONFIG_SYS_TEXT_BASE		0x80100000
 #define CONFIG_SYS_UBOOT_START		CONFIG_SYS_TEXT_BASE
 #define CONFIG_SPL_BSS_START_ADDR	0x80000000
 #define CONFIG_SPL_BSS_MAX_SIZE		(512 << 10)	/* 512 KB */
@@ -57,7 +56,6 @@
 /*
  * Board NAND Info.
  */
-#define CONFIG_NAND_OMAP_GPMC
 #define CONFIG_SYS_MAX_NAND_DEVICE	1		/* Max number of NAND */
 							/* devices */
 #define CONFIG_EXTRA_ENV_SETTINGS \
@@ -170,11 +168,10 @@
 
 #define CONFIG_ENV_SIZE			(128 << 10)	/* 128 KiB */
 #define ONENAND_ENV_OFFSET		0x260000 /* environment starts here */
-#define SMNAND_ENV_OFFSET		0x260000 /* environment starts here */
 
 #define CONFIG_SYS_ENV_SECT_SIZE	(128 << 10)	/* 128 KiB */
-#define CONFIG_ENV_OFFSET		SMNAND_ENV_OFFSET
-#define CONFIG_ENV_ADDR			SMNAND_ENV_OFFSET
+#define CONFIG_ENV_OFFSET		0x260000
+#define CONFIG_ENV_ADDR			0x260000
 
 /* Defines for SPL */
 

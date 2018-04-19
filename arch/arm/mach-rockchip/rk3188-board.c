@@ -24,9 +24,10 @@ int board_late_init(void)
 {
 	struct rk3188_grf *grf;
 
+	setup_boot_mode();
 	grf = syscon_get_first_range(ROCKCHIP_SYSCON_GRF);
 	if (IS_ERR(grf)) {
-		error("grf syscon returned %ld\n", PTR_ERR(grf));
+		pr_err("grf syscon returned %ld\n", PTR_ERR(grf));
 	} else {
 		/* enable noc remap to mimic legacy loaders */
 		rk_clrsetreg(&grf->soc_con0,

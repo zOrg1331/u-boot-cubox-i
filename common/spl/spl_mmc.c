@@ -52,8 +52,9 @@ static ulong h_spl_load_read(struct spl_load_info *load, ulong sector,
 	return blk_dread(mmc_get_blk_desc(mmc), sector, count, buf);
 }
 
-static int mmc_load_image_raw_sector(struct spl_image_info *spl_image,
-				     struct mmc *mmc, unsigned long sector)
+static __maybe_unused
+int mmc_load_image_raw_sector(struct spl_image_info *spl_image,
+			      struct mmc *mmc, unsigned long sector)
 {
 	unsigned long count;
 	struct image_header *header;
@@ -279,6 +280,17 @@ static int spl_mmc_do_fs_boot(struct spl_image_info *spl_image, struct mmc *mmc)
 	return -ENOSYS;
 }
 #endif
+
+u32 __weak spl_boot_mode(const u32 boot_device)
+{
+#if defined(CONFIG_SPL_FAT_SUPPORT) || defined(CONFIG_SPL_EXT_SUPPORT)
+	return MMCSD_MODE_FS;
+#elif defined(CONFIG_SUPPORT_EMMC_BOOT)
+	return MMCSD_MODE_EMMCBOOT;
+#else
+	return MMCSD_MODE_RAW;
+#endif
+}
 
 int spl_mmc_load_image(struct spl_image_info *spl_image,
 		       struct spl_boot_device *bootdev)

@@ -19,7 +19,6 @@
 #include <i2c.h>
 #include <initcall.h>
 #include <init_helpers.h>
-#include <logbuff.h>
 #include <malloc.h>
 #include <mapmem.h>
 #include <os.h>
@@ -50,7 +49,7 @@
 #ifdef XTRN_DECLARE_GLOBAL_DATA_PTR
 #undef	XTRN_DECLARE_GLOBAL_DATA_PTR
 #define XTRN_DECLARE_GLOBAL_DATA_PTR	/* empty = allocate here */
-DECLARE_GLOBAL_DATA_PTR = (gd_t *) (CONFIG_SYS_INIT_GD_ADDR);
+DECLARE_GLOBAL_DATA_PTR = (gd_t *)(CONFIG_SYS_INIT_GD_ADDR);
 #else
 DECLARE_GLOBAL_DATA_PTR;
 #endif
@@ -137,7 +136,7 @@ static int display_text_info(void)
 #endif
 
 	debug("U-Boot code: %08lX -> %08lX  BSS: -> %08lX\n",
-		text_base, bss_start, bss_end);
+	      text_base, bss_start, bss_end);
 #endif
 
 	return 0;
@@ -201,6 +200,13 @@ static int init_func_i2c(void)
 }
 #endif
 
+#if defined(CONFIG_VID)
+__weak int init_func_vid(void)
+{
+	return 0;
+}
+#endif
+
 #if defined(CONFIG_HARD_SPI)
 static int init_func_spi(void)
 {
@@ -219,7 +225,7 @@ static int setup_mon_len(void)
 	gd->mon_len = (ulong)&_end - (ulong)_init;
 #elif defined(CONFIG_NIOS2) || defined(CONFIG_XTENSA)
 	gd->mon_len = CONFIG_SYS_MONITOR_LEN;
-#elif defined(CONFIG_NDS32) || defined(CONFIG_SH)
+#elif defined(CONFIG_NDS32) || defined(CONFIG_SH) || defined(CONFIG_RISCV)
 	gd->mon_len = (ulong)(&__bss_end) - (ulong)(&_start);
 #elif defined(CONFIG_SYS_MONITOR_BASE)
 	/* TODO: use (ulong)&__bss_end - (ulong)&__text_start; ? */
@@ -295,20 +301,6 @@ static int setup_dest_addr(void)
 #endif
 	return 0;
 }
-
-#if defined(CONFIG_LOGBUFFER)
-static int reserve_logbuffer(void)
-{
-#ifndef CONFIG_ALT_LB_ADDR
-	/* reserve kernel log buffer */
-	gd->relocaddr -= LOGBUFF_RESERVE;
-	debug("Reserving %dk for kernel logbuffer at %08lx\n", LOGBUFF_LEN,
-		gd->relocaddr);
-#endif
-
-	return 0;
-}
-#endif
 
 #ifdef CONFIG_PRAM
 /* reserve protected RAM */
@@ -428,7 +420,7 @@ static int reserve_malloc(void)
 {
 	gd->start_addr_sp = gd->start_addr_sp - TOTAL_MALLOC_LEN;
 	debug("Reserving %dk for malloc() at: %08lx\n",
-			TOTAL_MALLOC_LEN >> 10, gd->start_addr_sp);
+	      TOTAL_MALLOC_LEN >> 10, gd->start_addr_sp);
 	return 0;
 }
 
@@ -458,7 +450,7 @@ static int reserve_global_data(void)
 	gd->start_addr_sp -= sizeof(gd_t);
 	gd->new_gd = (gd_t *)map_sysmem(gd->start_addr_sp, sizeof(gd_t));
 	debug("Reserving %zu Bytes for Global Data at: %08lx\n",
-			sizeof(gd_t), gd->start_addr_sp);
+	      sizeof(gd_t), gd->start_addr_sp);
 	return 0;
 }
 
@@ -766,6 +758,7 @@ static const init_fnc_t init_sequence_f[] = {
 	trace_early_init,
 #endif
 	initf_malloc,
+	log_init,
 	initf_bootstage,	/* uses its own timer, so does not need DM */
 	initf_console_record,
 #if defined(CONFIG_HAVE_FSP)
@@ -794,8 +787,7 @@ static const init_fnc_t init_sequence_f[] = {
 	console_init_f,		/* stage 1 init of console */
 	display_options,	/* say that we are here */
 	display_text_info,	/* show debugging info if required */
-#if defined(CONFIG_PPC) || defined(CONFIG_M68K) || defined(CONFIG_SH) || \
-		defined(CONFIG_X86)
+#if defined(CONFIG_PPC) || defined(CONFIG_SH) || defined(CONFIG_X86)
 	checkcpu,
 #endif
 #if defined(CONFIG_DISPLAY_CPUINFO)
@@ -814,6 +806,9 @@ static const init_fnc_t init_sequence_f[] = {
 	INIT_FUNC_WATCHDOG_RESET
 #if defined(CONFIG_SYS_I2C)
 	init_func_i2c,
+#endif
+#if defined(CONFIG_VID) && !defined(CONFIG_SPL)
+	init_func_vid,
 #endif
 #if defined(CONFIG_HARD_SPI)
 	init_func_spi,
@@ -846,9 +841,6 @@ static const init_fnc_t init_sequence_f[] = {
 	 *  - board info struct
 	 */
 	setup_dest_addr,
-#if defined(CONFIG_LOGBUFFER)
-	reserve_logbuffer,
-#endif
 #ifdef CONFIG_PRAM
 	reserve_pram,
 #endif
@@ -950,8 +942,13 @@ void board_init_f_r(void)
 	 * The pre-relocation drivers may be using memory that has now gone
 	 * away. Mark serial as unavailable - this will fall back to the debug
 	 * UART if available.
+	 *
+	 * Do the same with log drivers since the memory may not be available.
 	 */
-	gd->flags &= ~GD_FLG_SERIAL_READY;
+	gd->flags &= ~(GD_FLG_SERIAL_READY | GD_FLG_LOG_READY);
+#ifdef CONFIG_TIMER
+	gd->timer = NULL;
+#endif
 
 	/*
 	 * U-Boot has been copied into SDRAM, the BSS has been cleared etc.

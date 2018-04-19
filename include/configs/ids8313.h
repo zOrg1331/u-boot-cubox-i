@@ -17,7 +17,6 @@
  */
 #define CONFIG_MPC831x
 #define CONFIG_MPC8313
-#define CONFIG_IDS8313
 
 #define CONFIG_FSL_ELBC
 
@@ -286,7 +285,6 @@
  * SPI setup
  */
 #ifdef CONFIG_HARD_SPI
-#define CONFIG_MPC8XXX_SPI
 #define CONFIG_SYS_GPIO1_PRELIM
 #define CONFIG_SYS_GPIO1_DIR		0x00000001
 #define CONFIG_SYS_GPIO1_DAT		0x00000001
@@ -411,11 +409,6 @@
 /*
  * U-Boot environment setup
  */
-#define CONFIG_CMDLINE_EDITING
-#define CONFIG_BOOTP_SUBNETMASK
-#define CONFIG_BOOTP_GATEWAY
-#define CONFIG_BOOTP_HOSTNAME
-#define CONFIG_BOOTP_BOOTPATH
 #define CONFIG_BOOTP_BOOTFILESIZE
 
 /*
@@ -449,7 +442,6 @@
 /*
  * Miscellaneous configurable options
  */
-#define CONFIG_SYS_LONGHELP
 #define CONFIG_SYS_CBSIZE		1024
 #define CONFIG_SYS_BARGSIZE		CONFIG_SYS_CBSIZE
 
@@ -472,11 +464,6 @@
 /* mtdparts command line support */
 #define CONFIG_FLASH_CFI_MTD
 #define CONFIG_MTD_DEVICE
-#define MTDIDS_DEFAULT		"nor0=ff800000.flash,nand0=e1000000.flash"
-#define MTDPARTS_DEFAULT	"mtdparts=ff800000.flash:7m(dum)," \
-					"768k(BOOT-BIN)," \
-					"128k(BOOT-ENV),128k(BOOT-REDENV);" \
-					"e1000000.flash:-(ubi)"
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"netdev=" __stringify(CONFIG_NETDEV) "\0"			\
@@ -506,8 +493,8 @@
 			"${netmask}:${hostname}:${netdev}:off "		\
 			"console=${console},${baudrate} ${othbootargs}\0" \
 	"addmtd=setenv bootargs ${bootargs} ${mtdparts}\0"		\
-	"mtdids=" MTDIDS_DEFAULT "\0"					\
-	"mtdparts=" MTDPARTS_DEFAULT "\0"				\
+	"mtdids=" CONFIG_MTDIDS_DEFAULT "\0"					\
+	"mtdparts=" CONFIG_MTDPARTS_DEFAULT "\0"				\
 	"\0"
 
 #define CONFIG_NFSBOOTCOMMAND						\
@@ -520,12 +507,6 @@
 
 /* UBI Support */
 #define CONFIG_MTD_PARTITIONS
-
-/* bootcount support */
-#define CONFIG_BOOTCOUNT_LIMIT
-#define CONFIG_BOOTCOUNT_I2C
-#define CONFIG_BOOTCOUNT_ALEN	1
-#define CONFIG_SYS_BOOTCOUNT_ADDR	0x9
 
 #define CONFIG_IMAGE_FORMAT_LEGACY
 

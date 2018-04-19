@@ -11,7 +11,6 @@
 #ifndef __CONFIG_H
 #define __CONFIG_H
 
-#include <config_distro_defaults.h>
 #include "mx6_common.h"
 
 #include "imx6_spl.h"
@@ -59,10 +58,6 @@
 #define BOOT_TARGET_DEVICES(func) \
 	func(MMC, mmc, 0) \
 	func(DHCP, dhcp, na)
-
-#define CONFIG_BOOTCOMMAND \
-	"run findfdt; " \
-	"run distro_bootcmd"
 
 #include <config_distro_bootcmd.h>
 

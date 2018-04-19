@@ -2,8 +2,8 @@
 # SPDX-License-Identifier:	GPL-2.0+
 #
 
-VERSION = 2017
-PATCHLEVEL = 09
+VERSION = 2018
+PATCHLEVEL = 03
 SUBLEVEL =
 EXTRAVERSION =
 NAME =
@@ -349,7 +349,7 @@ OBJDUMP		= $(CROSS_COMPILE)objdump
 AWK		= awk
 PERL		= perl
 PYTHON		?= python
-DTC		?= dtc
+DTC		?= $(objtree)/scripts/dtc/dtc
 CHECK		= sparse
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
@@ -360,6 +360,7 @@ KBUILD_CPPFLAGS := -D__KERNEL__ -D__UBOOT__
 KBUILD_CFLAGS   := -Wall -Wstrict-prototypes \
 		   -Wno-format-security \
 		   -fno-builtin -ffreestanding
+KBUILD_CFLAGS	+= -fshort-wchar
 KBUILD_AFLAGS   := -D__ASSEMBLY__
 
 # Read UBOOTRELEASE from include/config/uboot.release (if it exists)
@@ -795,7 +796,7 @@ ALL-$(CONFIG_REMAKE_ELF) += u-boot.elf
 ALL-$(CONFIG_EFI_APP) += u-boot-app.efi
 ALL-$(CONFIG_EFI_STUB) += u-boot-payload.efi
 
-ifneq ($(BUILD_ROM),)
+ifneq ($(BUILD_ROM)$(CONFIG_BUILD_ROM),)
 ALL-$(CONFIG_X86_RESET_VECTOR) += u-boot.rom
 endif
 
@@ -810,12 +811,16 @@ ifneq ($(CONFIG_BUILD_TARGET),)
 ALL-y += $(CONFIG_BUILD_TARGET:"%"=%)
 endif
 
+ifneq ($(CONFIG_SYS_INIT_SP_BSS_OFFSET),)
+ALL-y += init_sp_bss_offset_check
+endif
+
 LDFLAGS_u-boot += $(LDFLAGS_FINAL)
 
 # Avoid 'Not enough room for program headers' error on binutils 2.28 onwards.
 LDFLAGS_u-boot += $(call ld-option, --no-dynamic-linker)
 
-ifneq ($(CONFIG_SYS_TEXT_BASE),)
+ifeq ($(CONFIG_ARC)$(CONFIG_NIOS2)$(CONFIG_X86)$(CONFIG_XTENSA),)
 LDFLAGS_u-boot += -Ttext $(CONFIG_SYS_TEXT_BASE)
 endif
 
@@ -871,13 +876,13 @@ endif
 PHONY += dtbs
 dtbs: dts/dt.dtb
 	@:
-dts/dt.dtb: checkdtc u-boot
+dts/dt.dtb: u-boot
 	$(Q)$(MAKE) $(build)=dts dtbs
 
 quiet_cmd_copy = COPY    $@
       cmd_copy = cp $< $@
 
-ifeq ($(CONFIG_FIT_EMBED),y)
+ifeq ($(CONFIG_MULTI_DTB_FIT),y)
 
 fit-dtb.blob: dts/dt.dtb FORCE
 	$(call if_changed,mkimage)
@@ -921,6 +926,16 @@ OBJCOPYFLAGS_u-boot.srec := -O srec
 u-boot.hex u-boot.srec: u-boot FORCE
 	$(call if_changed,objcopy)
 
+OBJCOPYFLAGS_u-boot-elf.srec := $(OBJCOPYFLAGS_u-boot.srec)
+
+u-boot-elf.srec: u-boot.elf FORCE
+	$(call if_changed,objcopy)
+
+OBJCOPYFLAGS_u-boot-spl.srec = $(OBJCOPYFLAGS_u-boot.srec)
+
+spl/u-boot-spl.srec: spl/u-boot-spl FORCE
+	$(call if_changed,objcopy)
+
 OBJCOPYFLAGS_u-boot-nodtb.bin := -O binary \
 		$(if $(CONFIG_X86_16BIT_INIT),-R .start16 -R .resetvec)
 
@@ -937,6 +952,33 @@ binary_size_check: u-boot-nodtb.bin FORCE
 			exit 1; \
 		fi \
 	fi
+
+ifneq ($(CONFIG_SYS_INIT_SP_BSS_OFFSET),)
+ifneq ($(CONFIG_SYS_MALLOC_F_LEN),)
+subtract_sys_malloc_f_len = space=$$(($${space} - $(CONFIG_SYS_MALLOC_F_LEN)))
+else
+subtract_sys_malloc_f_len = true
+endif
+# The 1/4 margin below is somewhat arbitrary. The likely initial SP usage is
+# so low that the DTB could probably use 90%+ of the available space, for
+# current values of CONFIG_SYS_INIT_SP_BSS_OFFSET at least. However, let's be
+# safe for now and tweak this later if space becomes tight.
+# A rejected alternative would be to check that some absolute minimum stack
+# space was available. However, since CONFIG_SYS_INIT_SP_BSS_OFFSET is
+# deliberately build-specific, to take account of build-to-build stack usage
+# differences due to different feature sets, there is no common absolute value
+# to check against.
+init_sp_bss_offset_check: u-boot.dtb FORCE
+	@dtb_size=$(shell wc -c u-boot.dtb | awk '{print $$1}') ; \
+	space=$(CONFIG_SYS_INIT_SP_BSS_OFFSET) ; \
+	$(subtract_sys_malloc_f_len) ; \
+	quarter_space=$$(($${space} / 4)) ; \
+	if [ $${dtb_size} -gt $${quarter_space} ]; then \
+		echo "u-boot.dtb is larger than 1 quarter of " >&2 ; \
+		echo "(CONFIG_SYS_INIT_SP_BSS_OFFSET - CONFIG_SYS_MALLOC_F_LEN)" >&2 ; \
+		exit 1 ; \
+	fi
+endif
 
 u-boot-nodtb.bin: u-boot FORCE
 	$(call if_changed,objcopy)
@@ -1021,6 +1063,7 @@ u-boot-dtb.img u-boot.img u-boot.kwb u-boot.pbl u-boot-ivt.img: \
 
 u-boot.itb: u-boot-nodtb.bin dts/dt.dtb $(U_BOOT_ITS) FORCE
 	$(call if_changed,mkfitimage)
+	$(BOARD_SIZE_CHECK)
 
 u-boot-spl.kwb: u-boot.img spl/u-boot-spl.bin FORCE
 	$(call if_changed,mkimage)
@@ -1134,7 +1177,7 @@ cmd_ldr = $(LD) $(LDFLAGS_$(@F)) \
 
 u-boot.rom: u-boot-x86-16bit.bin u-boot.bin \
 		$(if $(CONFIG_SPL_X86_16BIT_INIT),spl/u-boot-spl.bin) \
-		$(if $(CONFIG_HAVE_REFCODE),refcode.bin) checkbinman FORCE
+		$(if $(CONFIG_HAVE_REFCODE),refcode.bin) FORCE
 	$(call if_changed,binman)
 
 OBJCOPYFLAGS_u-boot-x86-16bit.bin := -O binary -j .start16 -j .resetvec
@@ -1143,12 +1186,16 @@ u-boot-x86-16bit.bin: u-boot FORCE
 endif
 
 ifneq ($(CONFIG_ARCH_SUNXI),)
-u-boot-sunxi-with-spl.bin: spl/sunxi-spl.bin u-boot.img u-boot.dtb \
-		checkbinman FORCE
+u-boot-sunxi-with-spl.bin: spl/sunxi-spl.bin u-boot.img u-boot.dtb FORCE
 	$(call if_changed,binman)
 endif
 
 ifneq ($(CONFIG_TEGRA),)
+ifneq ($(CONFIG_BINMAN),)
+u-boot-dtb-tegra.bin u-boot-tegra.bin u-boot-nodtb-tegra.bin: \
+		spl/u-boot-spl u-boot.bin FORCE
+	$(call if_changed,binman)
+else
 OBJCOPYFLAGS_u-boot-nodtb-tegra.bin = -O binary --pad-to=$(CONFIG_SYS_TEXT_BASE)
 u-boot-nodtb-tegra.bin: spl/u-boot-spl u-boot-nodtb.bin FORCE
 	$(call if_changed,pad_cat)
@@ -1159,6 +1206,7 @@ u-boot-tegra.bin: spl/u-boot-spl u-boot.bin FORCE
 
 u-boot-dtb-tegra.bin: u-boot-tegra.bin FORCE
 	$(call if_changed,copy)
+endif  # binman
 endif
 
 OBJCOPYFLAGS_u-boot-app.efi := $(OBJCOPYFLAGS_EFI)
@@ -1256,6 +1304,10 @@ u-boot:	$(u-boot-init) $(u-boot-main) u-boot.lds FORCE
 ifeq ($(CONFIG_KALLSYMS),y)
 	$(call cmd,smap)
 	$(call cmd,u-boot__) common/system_map.o
+endif
+
+ifeq ($(CONFIG_RISCV),y)
+	@tools/prelink-riscv $@ 0
 endif
 
 quiet_cmd_sym ?= SYM     $@
@@ -1378,18 +1430,6 @@ $(version_h): include/config/uboot.release FORCE
 $(timestamp_h): $(srctree)/Makefile FORCE
 	$(call filechk,timestamp.h)
 
-checkbinman: tools
-	@if ! ( echo 'import libfdt' | ( PYTHONPATH=tools $(PYTHON) )); then \
-		echo >&2; \
-		echo >&2 '*** binman needs the Python libfdt library.'; \
-		echo >&2 '*** Either install it on your system, or try:'; \
-		echo >&2 '***'; \
-		echo >&2 '*** sudo apt-get install swig libpython-dev'; \
-		echo >&2 '***'; \
-		echo >&2 '*** to have U-Boot build its own version.'; \
-		false; \
-	fi
-
 # ---------------------------------------------------------------------------
 quiet_cmd_cpp_lds = LDS     $@
 cmd_cpp_lds = $(CPP) -Wp,-MD,$(depfile) $(cpp_flags) $(LDPPFLAGS) \
@@ -1401,8 +1441,8 @@ u-boot.lds: $(LDSCRIPT) prepare FORCE
 spl/u-boot-spl.bin: spl/u-boot-spl
 	@:
 spl/u-boot-spl: tools prepare \
-		$(if $(CONFIG_OF_SEPARATE)$(CONFIG_SPL_OF_PLATDATA),dts/dt.dtb) \
-		$(if $(CONFIG_OF_SEPARATE)$(CONFIG_TPL_OF_PLATDATA),dts/dt.dtb)
+		$(if $(CONFIG_OF_SEPARATE)$(CONFIG_OF_EMBED)$(CONFIG_SPL_OF_PLATDATA),dts/dt.dtb) \
+		$(if $(CONFIG_OF_SEPARATE)$(CONFIG_OF_EMBED)$(CONFIG_TPL_OF_PLATDATA),dts/dt.dtb)
 	$(Q)$(MAKE) obj=spl -f $(srctree)/scripts/Makefile.spl all
 
 spl/sunxi-spl.bin: spl/u-boot-spl
@@ -1418,7 +1458,7 @@ spl/boot.bin: spl/u-boot-spl
 	@:
 
 tpl/u-boot-tpl.bin: tools prepare \
-		$(if $(CONFIG_OF_SEPARATE)$(CONFIG_SPL_OF_PLATDATA),dts/dt.dtb)
+		$(if $(CONFIG_OF_SEPARATE)$(CONFIG_OF_EMBED)$(CONFIG_SPL_OF_PLATDATA),dts/dt.dtb)
 	$(Q)$(MAKE) obj=tpl -f $(srctree)/scripts/Makefile.spl all
 
 TAG_SUBDIRS := $(patsubst %,$(srctree)/%,$(u-boot-dirs) include)
@@ -1446,12 +1486,6 @@ SYSTEM_MAP = \
 System.map:	u-boot
 		@$(call SYSTEM_MAP,$<) > $@
 
-checkdtc:
-	@if test $(call dtc-version) -lt 0104; then \
-		echo '*** Your dtc is too old, please upgrade to dtc 1.4 or newer'; \
-		false; \
-	fi
-
 #########################################################################
 
 # ARM relocations should all be R_ARM_RELATIVE (32-bit) or
@@ -1465,7 +1499,7 @@ checkarmreloc: u-boot
 		false; \
 	fi
 
-envtools: scripts_basic
+envtools: scripts_basic $(version_h) $(timestamp_h)
 	$(Q)$(MAKE) $(build)=tools/env
 
 tools-only: scripts_basic $(version_h) $(timestamp_h)
@@ -1590,6 +1624,7 @@ help:
 	@echo  ''
 	@echo  'Static analysers'
 	@echo  '  checkstack      - Generate a list of stack hogs'
+	@echo  '  coccicheck      - Execute static code analysis with Coccinelle'
 	@echo  ''
 	@echo  'Documentation targets:'
 	@$(MAKE) -f $(srctree)/doc/DocBook/Makefile dochelp
@@ -1681,6 +1716,14 @@ endif
 	$(Q)$(MAKE) KBUILD_MODULES=$(if $(CONFIG_MODULES),1)   \
 	$(build)=$(build-dir) $(@:.ko=.o)
 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+
+# Consistency checks
+# ---------------------------------------------------------------------------
+
+PHONY += coccicheck
+
+coccicheck:
+	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/$@
 
 # FIXME Should go into a make.lib or something
 # ===========================================================================

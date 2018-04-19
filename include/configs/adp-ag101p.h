@@ -14,16 +14,11 @@
 /*
  * CPU and Board Configuration Options
  */
-#define CONFIG_ADP_AG101P
-
 #define CONFIG_USE_INTERRUPT
 
 #define CONFIG_SKIP_LOWLEVEL_INIT
 
-#define CONFIG_CMDLINE_EDITING
-
-#define CONFIG_SYS_ICACHE_OFF
-#define CONFIG_SYS_DCACHE_OFF
+#define CONFIG_ARCH_MAP_SYSMEM
 
 #define CONFIG_BOOTP_SEND_HOSTNAME
 #define CONFIG_BOOTP_SERVERIP
@@ -33,16 +28,9 @@
 #endif
 
 #ifdef CONFIG_SKIP_LOWLEVEL_INIT
-#define CONFIG_SYS_TEXT_BASE	0x00500000
 #ifdef CONFIG_OF_CONTROL
 #undef CONFIG_OF_SEPARATE
 #define CONFIG_OF_EMBED
-#endif
-#else
-#ifdef CONFIG_MEM_REMAP
-#define CONFIG_SYS_TEXT_BASE	0x80000000
-#else
-#define CONFIG_SYS_TEXT_BASE	0x00000000
 #endif
 #endif
 
@@ -98,14 +86,12 @@
 /*
  * SD (MMC) controller
  */
-#define CONFIG_FTSDC010
 #define CONFIG_FTSDC010_NUMBER		1
 #define CONFIG_FTSDC010_SDIO
 
 /*
  * Miscellaneous configurable options
  */
-#define CONFIG_SYS_LONGHELP			/* undef to save memory */
 
 /*
  * Size of malloc() pool

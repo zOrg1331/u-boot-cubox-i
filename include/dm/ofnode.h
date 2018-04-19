@@ -45,7 +45,7 @@ struct resource;
  * the DT.
  *
  * @np: Pointer to device node, used for live tree
- * @flat_ptr: Pointer into flat device tree, used for flat tree. Note that this
+ * @of_offset: Pointer into flat device tree, used for flat tree. Note that this
  *	is not a really a pointer to a node: it is an offset value. See above.
  */
 typedef union ofnode_union {
@@ -302,12 +302,28 @@ ofnode ofnode_first_subnode(ofnode node);
 ofnode ofnode_next_subnode(ofnode node);
 
 /**
+ * ofnode_get_parent() - get the ofnode's parent (enclosing ofnode)
+ *
+ * @node: valid node to look up
+ * @return ofnode reference of the parent node
+ */
+ofnode ofnode_get_parent(ofnode node);
+
+/**
  * ofnode_get_name() - get the name of a node
  *
  * @node: valid node to look up
  * @return name or node
  */
 const char *ofnode_get_name(ofnode node);
+
+/**
+ * ofnode_get_by_phandle() - get ofnode from phandle
+ *
+ * @phandle:	phandle to look up
+ * @return ofnode reference to the phandle
+ */
+ofnode ofnode_get_by_phandle(uint phandle);
 
 /**
  * ofnode_read_size() - read the size of a property
@@ -628,4 +644,41 @@ int ofnode_read_resource(ofnode node, uint index, struct resource *res);
 int ofnode_read_resource_byname(ofnode node, const char *name,
 				struct resource *res);
 
+/**
+ * ofnode_for_each_subnode() - iterate over all subnodes of a parent
+ *
+ * @node:       child node (ofnode, lvalue)
+ * @parent:     parent node (ofnode)
+ *
+ * This is a wrapper around a for loop and is used like so:
+ *
+ *	ofnode node;
+ *
+ *	ofnode_for_each_subnode(node, parent) {
+ *		Use node
+ *		...
+ *	}
+ *
+ * Note that this is implemented as a macro and @node is used as
+ * iterator in the loop. The parent variable can be a constant or even a
+ * literal.
+ */
+#define ofnode_for_each_subnode(node, parent) \
+	for (node = ofnode_first_subnode(parent); \
+	     ofnode_valid(node); \
+	     node = ofnode_next_subnode(node))
+
+/**
+ * ofnode_translate_address() - Tranlate a device-tree address
+ *
+ * Translate an address from the device-tree into a CPU physical address. This
+ * function walks up the tree and applies the various bus mappings along the
+ * way.
+ *
+ * @ofnode: Device tree node giving the context in which to translate the
+ *          address
+ * @in_addr: pointer to the address to translate
+ * @return the translated address; OF_BAD_ADDR on error
+ */
+u64 ofnode_translate_address(ofnode node, const fdt32_t *in_addr);
 #endif

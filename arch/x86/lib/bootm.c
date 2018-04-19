@@ -28,11 +28,6 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define COMMAND_LINE_OFFSET 0x9000
 
-int arch_fixup_fdt(void *blob)
-{
-	return 0;
-}
-
 __weak void board_quiesce_devices(void)
 {
 }
@@ -109,7 +104,7 @@ static int boot_prep_linux(bootm_headers_t *images)
 		}
 		is_zimage = 1;
 #if defined(CONFIG_FIT)
-	} else if (images->fit_uname_os) {
+	} else if (images->fit_uname_os && is_zimage) {
 		ret = fit_image_get_data(images->fit_hdr_os,
 				images->fit_noffset_os,
 				(const void **)&data, &len);

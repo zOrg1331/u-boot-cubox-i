@@ -30,13 +30,10 @@
  *
  */
 #define CONFIG_ARC_SERIAL
-#define CONFIG_ARC_UART_BASE		0xC0FC1000
 
 /*
  * Command line configuration
  */
-#define CONFIG_AUTO_COMPLETE
-#define CONFIG_CMDLINE_EDITING
 
 /*
  * Environment settings
@@ -53,6 +50,5 @@
 /*
  * Console configuration
  */
-#define CONFIG_SYS_LONGHELP
 
 #endif /* _CONFIG_NSIM_H_ */

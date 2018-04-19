@@ -56,7 +56,6 @@
  * SPI Flash configuration
  */
 #ifdef CONFIG_CMD_SF
-#define CONFIG_KIRKWOOD_SPI
 #ifndef CONFIG_ENV_SPI_BUS
 # define CONFIG_ENV_SPI_BUS		0
 #endif
@@ -76,9 +75,6 @@
  */
 #ifdef CONFIG_CMD_NET
 #define CONFIG_MII		/* expose smi ove miiphy interface */
-#if !defined(CONFIG_ARMADA_375)
-#define CONFIG_MVNETA		/* Enable Marvell Gbe Controller Driver */
-#endif
 #define CONFIG_ENV_OVERWRITE	/* ethaddr can be reprogrammed */
 #define CONFIG_ARP_TIMEOUT	200
 #define CONFIG_NET_RETRY_COUNT	50

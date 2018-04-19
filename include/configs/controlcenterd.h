@@ -55,7 +55,6 @@
 
 #ifdef CONFIG_TRAILBLAZER
 
-#define CONFIG_SYS_TEXT_BASE		0xf8fc0000
 #define CONFIG_RESET_VECTOR_ADDRESS	0xf8fffffc
 #define CONFIG_SYS_MONITOR_LEN		(256 * 1024)
 
@@ -73,7 +72,6 @@
 
 #else /* CONFIG_TRAILBLAZER */
 
-#define CONFIG_SYS_TEXT_BASE		0x11000000
 #define CONFIG_RESET_VECTOR_ADDRESS	0x1107fffc
 #define CONFIG_SYS_MONITOR_LEN		(512 * 1024)
 
@@ -245,10 +243,8 @@
 /*
  * SATA
  */
-#define CONFIG_LIBATA
 #define CONFIG_LBA48
 
-#define CONFIG_FSL_SATA
 #define CONFIG_SYS_SATA_MAX_DEVICE	2
 #define CONFIG_SATA1
 #define CONFIG_SYS_SATA1		CONFIG_SYS_MPC85xx_SATA1_ADDR
@@ -315,11 +311,6 @@
 /*
  * Command line configuration.
  */
-#ifndef CONFIG_TRAILBLAZER
-#define CONFIG_SYS_LONGHELP
-#define CONFIG_CMDLINE_EDITING			/* Command-line editing */
-#define CONFIG_AUTO_COMPLETE			/* add autocompletion support */
-#endif /* CONFIG_TRAILBLAZER */
 
 #define CONFIG_SYS_LOAD_ADDR	0x2000000	/* default load address */
 

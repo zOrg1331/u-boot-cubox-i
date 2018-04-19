@@ -17,7 +17,6 @@
  * for DDR ECC byte filling in the SPL before loading the main
  * U-Boot into it.
  */
-#define	CONFIG_SYS_TEXT_BASE	0x00800000
 #define CONFIG_SYS_TCLK		250000000	/* 250MHz */
 
 /*
@@ -65,12 +64,7 @@
 
 /* SATA support */
 #define CONFIG_SYS_SATA_MAX_DEVICE	1
-#define CONFIG_SATA_MV
-#define CONFIG_LIBATA
 #define CONFIG_LBA48
-
-/* Additional FS support/configuration */
-#define CONFIG_SUPPORT_VFAT
 
 /* PCIe support */
 #ifdef CONFIG_CMD_PCI
@@ -88,8 +82,6 @@
 /*
  * Bootcounter
  */
-#define CONFIG_BOOTCOUNT_LIMIT
-#define CONFIG_BOOTCOUNT_RAM
 /* Max size of RAM minus BOOTCOUNT_ADDR is the bootcounter address */
 #define BOOTCOUNT_ADDR			0x1000
 
@@ -114,7 +106,6 @@
 
 /* SPL */
 /* Defines for SPL */
-#define CONFIG_SPL_FRAMEWORK
 #define CONFIG_SPL_TEXT_BASE		0x40004030
 #define CONFIG_SPL_MAX_SIZE		((128 << 10) - 0x4030)
 

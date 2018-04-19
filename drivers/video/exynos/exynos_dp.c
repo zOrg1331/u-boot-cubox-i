@@ -11,7 +11,7 @@
 #include <common.h>
 #include <display.h>
 #include <fdtdec.h>
-#include <libfdt.h>
+#include <linux/libfdt.h>
 #include <malloc.h>
 #include <video_bridge.h>
 #include <linux/compat.h>
@@ -1075,7 +1075,7 @@ static const struct udevice_id exynos_dp_ids[] = {
 };
 
 U_BOOT_DRIVER(exynos_dp) = {
-	.name	= "eexynos_dp",
+	.name	= "exynos_dp",
 	.id	= UCLASS_DISPLAY,
 	.of_match = exynos_dp_ids,
 	.ops	= &exynos_dp_ops,

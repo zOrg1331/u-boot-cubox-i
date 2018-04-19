@@ -3,11 +3,16 @@ comment "FASTBOOT"
 menuconfig FASTBOOT
 	bool "Fastboot support"
 	depends on USB_GADGET
+	default y if ARCH_SUNXI && USB_MUSB_GADGET
 
 if FASTBOOT
 
 config USB_FUNCTION_FASTBOOT
 	bool "Enable USB fastboot gadget"
+	default y
+	select USB_GADGET_DOWNLOAD
+	imply ANDROID_BOOT_IMAGE
+	imply CMD_FASTBOOT
 	help
 	  This enables the USB part of the fastboot gadget.
 
@@ -61,18 +66,45 @@ config FASTBOOT_USB_DEV
 
 config FASTBOOT_FLASH
 	bool "Enable FASTBOOT FLASH command"
+	default y if ARCH_SUNXI
 	help
 	  The fastboot protocol includes a "flash" command for writing
 	  the downloaded image to a non-volatile storage device. Define
 	  this to enable the "fastboot flash" command.
 
+choice
+	prompt "Flash provider for FASTBOOT"
+	depends on FASTBOOT_FLASH
+
+config FASTBOOT_FLASH_MMC
+	bool "FASTBOOT on MMC"
+	depends on MMC
+
+config FASTBOOT_FLASH_NAND
+	bool "FASTBOOT on NAND"
+	depends on NAND
+
+endchoice
+
 config FASTBOOT_FLASH_MMC_DEV
 	int "Define FASTBOOT MMC FLASH default device"
-	depends on FASTBOOT_FLASH && MMC
+	depends on FASTBOOT_FLASH_MMC
+	default 0 if ARCH_SUNXI && MMC_SUNXI_SLOT_EXTRA = -1
+	default 1 if ARCH_SUNXI && MMC_SUNXI_SLOT_EXTRA != -1
 	help
 	  The fastboot "flash" command requires additional information
 	  regarding the non-volatile storage device. Define this to
 	  the eMMC device that fastboot should use to store the image.
+
+config FASTBOOT_FLASH_NAND_DEV
+	int "Define FASTBOOT NAND FLASH default device"
+	depends on FASTBOOT_FLASH_NAND
+	depends on CMD_MTDPARTS
+	default 0 if ARCH_SUNXI && NAND_SUNXI
+	help
+	  The fastboot "flash" command requires additional information
+	  regarding the non-volatile storage device. Define this to
+	  the NAND device that fastboot should use to store the image.
 
 config FASTBOOT_GPT_NAME
 	string "Target name for updating GPT"

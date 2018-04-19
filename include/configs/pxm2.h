@@ -14,7 +14,6 @@
 #ifndef __CONFIG_PXM2_H
 #define __CONFIG_PXM2_H
 
-#define CONFIG_SIEMENS_PXM2
 #define CONFIG_SIEMENS_MACH_TYPE	MACH_TYPE_PXM2
 
 #include "siemens-am33x-common.h"
@@ -45,7 +44,6 @@
 #ifndef CONFIG_SPL_BUILD
 
 /* Use common default */
-#define MTDPARTS_DEFAULT	MTDPARTS_DEFAULT_V1
 
 /* Default env settings */
 #define CONFIG_EXTRA_ENV_SETTINGS \
