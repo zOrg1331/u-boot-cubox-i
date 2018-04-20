@@ -1,5 +1,5 @@
 Name: u-boot-sunxi
-Version: 2017.09
+Version: 2018.03
 Release: alt1
 
 Summary: Das U-Boot
@@ -18,14 +18,15 @@ BuildRequires: atf-sunxi
 boot loader for embedded boards based on PowerPC, ARM, MIPS and several
 other processors, which can be installed in a boot ROM and used to
 initialize and test the hardware or to download and run application code.
-This package supports various Allwinner A10/A13/A20/A23/A31 based boards.
+This package supports various Allwinner H5 based boards.
 
 %prep
 %setup
 
 %build
-export BL31=%_datadir/u-boot/bl31.bin
+export BL31=%_datadir/atf/sun50iw1p1/bl31.bin
 boards=$(grep -lr MACH_SUN50I configs |sed 's,^configs/\(.\+\)_defconfig,\1,')
+boards='orangepi_pc2 nanopi_a64 pine64_plus'
 for board in $boards; do
 	mkdir build
 	%make_build HOSTCC='ccache gcc' CC='ccache gcc' O=build ${board}_defconfig all
@@ -44,6 +45,9 @@ find . -type f | cpio -pmd %buildroot%_datadir/u-boot
 %_datadir/u-boot/*
 
 %changelog
+* Thu Apr 19 2018 Sergey Bolshakov <sbolshakov@altlinux.ru> 2018.03-alt1
+- 2018.03 released
+
 * Sun Sep 24 2017 Sergey Bolshakov <sbolshakov@altlinux.ru> 2017.09-alt1
 - 2017.09 released
 
