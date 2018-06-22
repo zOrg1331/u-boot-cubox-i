@@ -63,7 +63,7 @@ struct msg_get_clock_rate {
 };
 
 #ifdef CONFIG_ARM64
-#define DTB_DIR "broadcom/"
+#define DTB_DIR ""
 #else
 #define DTB_DIR ""
 #endif
