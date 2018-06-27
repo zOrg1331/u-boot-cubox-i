@@ -11,7 +11,7 @@
 
 /* Serial setup */
 
-#define MESON_FDTFILE_SETTING "fdtfile=amlogic/meson-gxbb-odroidc2.dtb\0"
+#define MESON_FDTFILE_SETTING "fdtfile=meson-gxbb-odroidc2.dtb\0"
 
 #include <configs/meson-gxbb-common.h>
 
