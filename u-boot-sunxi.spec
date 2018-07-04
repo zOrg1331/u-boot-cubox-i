@@ -1,11 +1,13 @@
-Name: u-boot-sunxi
-Version: 2018.03
+Name: u-boot-sunxi64
+Version: 2018.05
 Release: alt1
 
 Summary: Das U-Boot
 License: GPL
 Group: System/Kernel and hardware
 Url: http://linux-sunxi.org/U-Boot
+
+ExclusiveArch: aarch64
 
 Source: %name-%version-%release.tar
 
@@ -26,7 +28,6 @@ This package supports various Allwinner H5 based boards.
 %build
 export BL31=%_datadir/atf/sun50iw1p1/bl31.bin
 boards=$(grep -lr MACH_SUN50I configs |sed 's,^configs/\(.\+\)_defconfig,\1,')
-boards='orangepi_pc2 nanopi_a64 pine64_plus'
 for board in $boards; do
 	mkdir build
 	%make_build HOSTCC='ccache gcc' CC='ccache gcc' O=build ${board}_defconfig all
@@ -37,7 +38,7 @@ done
 
 %install
 mkdir -p %buildroot%_datadir/u-boot
-cd out 
+cd out
 find . -type f | cpio -pmd %buildroot%_datadir/u-boot
 
 %files
@@ -45,6 +46,9 @@ find . -type f | cpio -pmd %buildroot%_datadir/u-boot
 %_datadir/u-boot/*
 
 %changelog
+* Fri Jun 29 2018 Sergey Bolshakov <sbolshakov@altlinux.ru> 2018.05-alt1
+- 2018.05 released
+
 * Thu Apr 19 2018 Sergey Bolshakov <sbolshakov@altlinux.ru> 2018.03-alt1
 - 2018.03 released
 
